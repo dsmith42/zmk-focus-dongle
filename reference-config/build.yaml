@@ -1,0 +1,10 @@
+# CI build targets, in ZMK's standard build matrix format.
+#
+# One target, deliberately. This module has one job and one screen, so there is
+# no matrix of layouts to keep alive. Add an entry here to build another; the
+# workflow reads this file and needs no changes.
+---
+include:
+  - board: xiao_ble//zmk
+    shield: ref_dongle
+    artifact-name: ref-dongle
