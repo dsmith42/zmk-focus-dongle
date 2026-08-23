@@ -18,10 +18,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Builds reference-config/, a keyless split central. See its README.
+  # A ZMK module is only compiled when a keyboard config pulls it in, so CI
+  # builds one: reference-config/, a keyless split central. See its README.
   #
-  # Right now that is stock ZMK and nothing else, which is the point: a red build
-  # here can only mean the CI plumbing is wrong.
+  # ZMK's reusable workflow detects that this repo is itself a module and passes
+  # the checkout as ZMK_EXTRA_MODULES, building in an isolated workspace. That is
+  # what makes the check meaningful: the code under test is this commit, not
+  # whatever west would otherwise fetch.
   #
   # `config_path` must stay single-level — ZMK's workflow does a non-recursive
   # mkdir on it, so a nested path such as tests/reference-config fails.
