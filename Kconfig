@@ -1,0 +1,3 @@
+# Options land alongside the code that reads them. Empty on purpose: at this
+# point the module is a valid, loadable no-op, which is exactly what CI is
+# proving before any of our code is added.
