@@ -10,11 +10,23 @@ records what and whose, with the licence text each requires.
 
    https://github.com/carrefinho/prospector-zmk-module
 
-   The shield definition in this repository — the devicetree overlays describing
-   the display, backlight and board wiring, and the Kconfig around them — is
-   DERIVED FROM that project. It was imported substantially verbatim and then
-   modified; see the commit history, where the import and the subsequent changes
-   are deliberately separate commits.
+   The hardware layer of this repository is DERIVED FROM that project:
+
+     - the devicetree overlays describing the display, backlight and board wiring
+     - the shield Kconfig.shield / Kconfig.defconfig and its .conf
+     - src/brightness.c and src/display_rotate_init.c
+     - the build glue: the root and shield CMakeLists.txt, the root Kconfig
+       option names and wording, and the shape of zephyr/module.yml
+     - drivers/display/CMakeLists.txt, which shadows Zephyr's display driver with
+       the modified copy described in section 3
+
+   Each such file carries a header naming its origin. They were imported
+   substantially verbatim and then modified; see the commit history, where the
+   import and the subsequent changes are deliberately separate commits.
+
+   Everything above the hardware layer — the status screen, the focus-block
+   timer, the behaviours, the theming and the font pipeline — is original work
+   in this repository and is covered by LICENSE.
 
 MIT License
 
@@ -53,9 +65,21 @@ SOFTWARE.
 
    https://github.com/zephyrproject-rtos/zephyr
 
-   Any display driver code vendored into this repository originates with Zephyr,
-   not with the Prospector module. At the time of writing none is vendored: the
-   stock sitronix,st7789v driver is used.
+   drivers/display/display_st7789v.c and .h are Zephyr's driver for that controller,
+   modified to add display orientation support. Upstream Zephyr returns -ENOTSUP
+   for any orientation other than NORMAL, which cannot drive this panel: it is a
+   240x280 portrait module used in landscape.
+
+   The modification originates with carrefinho/prospector-zmk-module (MIT) and is
+   redistributed here under Apache-2.0, the licence of the file it modifies, with
+   the notice of modification Apache-2.0 section 4(b) requires carried at the top
+   of the file itself.
+
+   drivers/display/CMakeLists.txt, which shadows Zephyr's copy with the modified
+   one, is carrefinho's own file and is MIT — see section 1.
+
+   Orientation support for this controller is not specific to this hardware and
+   belongs upstream in Zephyr. Should it land there, these files go away.
 
 --------------------------------------------------------------------------------
 4. Fonts

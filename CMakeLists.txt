@@ -1,3 +1,9 @@
-# Nothing to build yet. The focus-block timer core arrives in phase 3 and the
-# shield in phase 2; this file exists so `build: cmake: .` in zephyr/module.yml
-# resolves and the module can be loaded by a ZMK build.
+# Derived from carrefinho/prospector-zmk-module (MIT) — see NOTICE.
+
+zephyr_include_directories(include)
+zephyr_library()
+
+if(CONFIG_SHIELD_PROSPECTOR_ADAPTER)
+        # The display driver shadows Zephyr's own — see drivers/display/.
+        add_subdirectory(${ZEPHYR_CURRENT_MODULE_DIR}/drivers/display)
+endif()
