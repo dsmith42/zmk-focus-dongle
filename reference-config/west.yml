@@ -1,0 +1,13 @@
+# Plain ZMK. Nothing of ours is built yet — this manifest exists so CI can prove
+# it can build ZMK at all for this board and shield, with no module in the way.
+manifest:
+  remotes:
+    - name: zmkfirmware
+      url-base: https://github.com/zmkfirmware
+  projects:
+    - name: zmk
+      remote: zmkfirmware
+      revision: main
+      import: app/west.yml
+  self:
+    path: config

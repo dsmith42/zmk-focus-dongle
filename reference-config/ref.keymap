@@ -1,0 +1,25 @@
+/*
+ * Minimal keymap for the CI reference build.
+ *
+ * Four positions on a fictional 2x2 matrix — see ref_dongle.overlay for why.
+ * Bindings this module adds get exercised here as they arrive, so CI fails if a
+ * behaviour stops resolving rather than only if the widgets stop compiling.
+ * Nothing to exercise yet.
+ */
+
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+
+/ {
+    keymap {
+        compatible = "zmk,keymap";
+
+        base_layer {
+            display-name = "Base";
+            bindings = <
+&none  &none
+&none  &none
+            >;
+        };
+    };
+};
