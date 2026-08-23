@@ -1,0 +1,48 @@
+name: Build
+
+# Every check would otherwise run twice: pushing a branch that has an open PR
+# fires both `push` and `pull_request`.
+#
+# Direct pushes to `main` are blocked by the repository ruleset, so the only
+# `push` event left here is the merge commit a PR produces. That build earns its
+# place — it is the firmware matching what is actually flashed, and it catches
+# two PRs that were each green alone but break once combined. `pull_request`
+# covers everything before that, exactly once.
+#
+# A branch pushed with no PR open does not build. Open the PR, or use the
+# workflow_dispatch button.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  # Builds reference-config/, a keyless split central. See its README.
+  #
+  # Right now that is stock ZMK and nothing else, which is the point: a red build
+  # here can only mean the CI plumbing is wrong.
+  #
+  # `config_path` must stay single-level — ZMK's workflow does a non-recursive
+  # mkdir on it, so a nested path such as tests/reference-config fails.
+  build:
+    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
+    with:
+      build_matrix_path: reference-config/build.yaml
+      config_path: reference-config
+
+  # Single stable check for branch protection. Matrix job names are derived from
+  # build.yaml and change whenever a target is added, so pinning required checks
+  # to them silently blocks every PR the next time the matrix is edited. This
+  # name never changes.
+  gate:
+    name: gate
+    runs-on: ubuntu-latest
+    needs: build
+    if: always()
+    steps:
+      - name: Fail if any firmware build failed
+        if: needs.build.result != 'success'
+        run: |
+          echo "build result: ${{ needs.build.result }}"
+          exit 1
