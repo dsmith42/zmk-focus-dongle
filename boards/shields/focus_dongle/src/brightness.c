@@ -13,7 +13,7 @@ LOG_MODULE_REGISTER(als, 4);
 static const struct device *pwm_leds_dev = DEVICE_DT_GET_ONE(pwm_leds);
 #define DISP_BL DT_NODE_CHILD_IDX(DT_NODELABEL(disp_bl))
 
-#ifdef CONFIG_PROSPECTOR_USE_AMBIENT_LIGHT_SENSOR
+#ifdef CONFIG_FOCUS_DONGLE_USE_AMBIENT_LIGHT_SENSOR
 
 static uint8_t current_brightness = 100;
 
@@ -150,7 +150,7 @@ K_THREAD_DEFINE(als_tid, 1024, als_thread, NULL, NULL, NULL, K_LOWEST_APPLICATIO
 #else
 
 static int init_fixed_brightness(void) {
-    led_set_brightness(pwm_leds_dev, DISP_BL, CONFIG_PROSPECTOR_FIXED_BRIGHTNESS);
+    led_set_brightness(pwm_leds_dev, DISP_BL, CONFIG_FOCUS_DONGLE_FIXED_BRIGHTNESS);
 
     return 0;
 }

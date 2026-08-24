@@ -6,5 +6,5 @@
 ---
 include:
   - board: xiao_ble//zmk
-    shield: ref_dongle prospector_adapter
+    shield: ref_dongle focus_dongle
     artifact-name: ref-dongle

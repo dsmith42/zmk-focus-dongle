@@ -5,7 +5,7 @@ keyboard configuration pulls it in. This directory is the smallest such
 configuration, and exists so CI can prove the module builds.
 
 It is a keyless split central: a mock kscan, a fictional 2x2 matrix, and nothing
-else, with the module's own shield stacked on top of it — which is exactly how a
+else, with the module's own `focus_dongle` shield stacked on top of it — which is exactly how a
 consumer wires this up. That is the shape of a dongle. ZMK requires a transform and a keymap of
 matching size; four positions satisfy that and leave room to bind this module's
 behaviours as they arrive. The module draws a screen and owns a timer — nothing
