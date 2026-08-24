@@ -1,3 +1,5 @@
+# Shape derived from carrefinho/prospector-zmk-module (MIT) — see NOTICE.
+
 name: zmk-focus-dongle
 build:
   cmake: .

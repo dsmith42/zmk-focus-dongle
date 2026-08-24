@@ -1,0 +1,7 @@
+/* Derived from carrefinho/prospector-zmk-module (MIT) — see NOTICE. */
+
+/ {
+   chosen {
+      zephyr,display = &st7789;
+  };
+};

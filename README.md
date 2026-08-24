@@ -19,7 +19,9 @@ Prospector dongle and popularised it. If you want one,
   [carrefinho/prospector-zmk-module](https://github.com/carrefinho/prospector-zmk-module),
   MIT. The overlays describing the display, backlight and board wiring came from there;
   see [`NOTICE`](NOTICE) and the commit history.
-- **Display driver** — Zephyr's stock `sitronix,st7789v`, Apache-2.0
+- **Display driver** — Zephyr's `sitronix,st7789v`, Apache-2.0, vendored with
+  carrefinho's modification adding display orientation support. Upstream Zephyr
+  cannot rotate this panel. See [`NOTICE`](NOTICE).
 
 Everything above the hardware layer — the dial, the block timer, the behaviours, the
 theming and the font pipeline — is new work in this repository.
