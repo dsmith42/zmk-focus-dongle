@@ -5,6 +5,22 @@
 # workflow reads this file and needs no changes.
 ---
 include:
+  # The dongle: the display shield stacked on a keyless central.
   - board: xiao_ble//zmk
     shield: ref_dongle focus_dongle
     artifact-name: ref-dongle
+
+  # A split peripheral: same keymap, no display shield, not central.
+  #
+  # This target exists to catch one specific class of bug, which this project
+  # has hit twice. A peripheral compiles the same keymap as the dongle, so it
+  # must resolve every behaviour bound in it — while having no screen and none
+  # of the shield's devicetree. Anything the module puts behind CONFIG_SHIELD_
+  # that the keymap can reach breaks here and nowhere else.
+  #
+  # A different board on purpose: it also proves the module is not quietly
+  # assuming the dongle's SoC.
+  - board: nice_nano//zmk
+    shield: ref_dongle
+    cmake-args: -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=n
+    artifact-name: ref-peripheral

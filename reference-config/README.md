@@ -17,6 +17,19 @@ ZMK's reusable workflow does a non-recursive `mkdir` on `config_path`, so a
 nested location such as `tests/reference-config` fails before the build starts.
 Single-level or nothing.
 
+## The two targets
+
+`ref-dongle` is the display build: the module's `focus_dongle` shield stacked on a
+keyless central, which is how a consumer wires this up.
+
+`ref-peripheral` is a split half — the same keymap, no display shield, not
+central. It exists to catch one specific class of bug: a peripheral compiles the
+keymap the dongle does, so it has to resolve every behaviour bound in it while
+having no screen and none of the shield's devicetree. Anything the module hides
+behind `CONFIG_SHIELD_` that a keymap can reach fails here and nowhere else.
+It builds on a different board too, which proves the module is not assuming the
+dongle's SoC.
+
 ## Adding a build target
 
 Append to `build.yaml`. The CI matrix is generated from that file and the
