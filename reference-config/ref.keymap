@@ -15,7 +15,13 @@
      * behaviour node declared in the shield would leave them referencing a node
      * they cannot see, and every half build fails with "undefined node label". */
     behaviors {
-        focus_time: focus_time {
+        /* Label short, node name descriptive. The label is what a keymap types
+         * and this one repeats across a row of lengths, so `&focus 45` keeps a
+         * timer layer readable where `&focus_time 45` would not. The two
+         * zero-parameter behaviours appear once each and read better spelled
+         * out. Labels are the consumer's choice — the module's API is the
+         * compatible, not this. */
+        focus: focus_time {
             compatible = "zmk,behavior-focus-time";
             #binding-cells = <1>;
         };
@@ -37,8 +43,8 @@
         base_layer {
             display-name = "Base";
             bindings = <
-&focus_time 45  &focus_start
-&focus_stop     &none
+&focus 45    &focus_start
+&focus_stop  &none
             >;
         };
     };
