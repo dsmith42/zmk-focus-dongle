@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: MIT
+
+description: |
+  Start a focus block of the armed length.
+
+  Ignored while a block is live, including while it is overrunning — an
+  overrunning block holds its figure until it is deliberately stopped.
+
+compatible: "zmk,behavior-focus-start"
+
+include: zero_param.yaml

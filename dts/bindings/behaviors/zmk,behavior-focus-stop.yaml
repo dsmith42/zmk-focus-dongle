@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: MIT
+
+description: |
+  Stop the running focus block and clear it.
+
+  Also the act that ends an overrunning block, which is the moment its overrun
+  is read.
+
+compatible: "zmk,behavior-focus-stop"
+
+include: zero_param.yaml

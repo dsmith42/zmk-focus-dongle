@@ -4,21 +4,47 @@
  * Four positions on a fictional 2x2 matrix — see ref_dongle.overlay for why.
  * Bindings this module adds get exercised here as they arrive, so CI fails if a
  * behaviour stops resolving rather than only if the widgets stop compiling.
- * Nothing to exercise yet.
  */
 
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
 
 / {
+    /* Declared here rather than in a shield overlay, deliberately. In a split,
+     * the peripherals compile this same keymap but not the display shield — a
+     * behaviour node declared in the shield would leave them referencing a node
+     * they cannot see, and every half build fails with "undefined node label". */
+    behaviors {
+        /* Label short, node name descriptive. The label is what a keymap types
+         * and this one repeats across a row of lengths, so `&focus 45` keeps a
+         * timer layer readable where `&focus_time 45` would not. The two
+         * zero-parameter behaviours appear once each and read better spelled
+         * out. Labels are the consumer's choice — the module's API is the
+         * compatible, not this. */
+        focus: focus_time {
+            compatible = "zmk,behavior-focus-time";
+            #binding-cells = <1>;
+        };
+
+        focus_start: focus_start {
+            compatible = "zmk,behavior-focus-start";
+            #binding-cells = <0>;
+        };
+
+        focus_stop: focus_stop {
+            compatible = "zmk,behavior-focus-stop";
+            #binding-cells = <0>;
+        };
+    };
+
     keymap {
         compatible = "zmk,keymap";
 
         base_layer {
             display-name = "Base";
             bindings = <
-&none  &none
-&none  &none
+&focus 45    &focus_start
+&focus_stop  &none
             >;
         };
     };
