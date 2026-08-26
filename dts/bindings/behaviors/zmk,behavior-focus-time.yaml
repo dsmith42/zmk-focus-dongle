@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: MIT
+
+description: |
+  Arm a focus block of the given length in minutes.
+
+  Arming only selects; nothing runs until a focus-start binding is pressed. The
+  armed length survives a block, so the common case is start-without-choosing.
+
+  Ignored while a block is live, including while it is overrunning. Changing
+  length mid-block is therefore stop, arm, start — three deliberate acts.
+
+compatible: "zmk,behavior-focus-time"
+
+include: one_param.yaml

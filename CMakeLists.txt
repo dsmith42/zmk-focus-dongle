@@ -13,6 +13,22 @@ zephyr_library_include_directories(${CMAKE_SOURCE_DIR}/include)
 zephyr_library_sources(src/timer.c)
 zephyr_library_sources(src/events/timer_state_changed.c)
 
+# The behaviours build on every target too, and for the same reason: the keymap
+# that binds them is compiled by the peripherals as well as the dongle. Each is
+# gated only on its own devicetree node existing, so a keymap that binds none of
+# them costs nothing.
+if(CONFIG_DT_HAS_ZMK_BEHAVIOR_FOCUS_TIME_ENABLED)
+        zephyr_library_sources(src/behaviors/behavior_focus_time.c)
+endif()
+
+if(CONFIG_DT_HAS_ZMK_BEHAVIOR_FOCUS_START_ENABLED)
+        zephyr_library_sources(src/behaviors/behavior_focus_start.c)
+endif()
+
+if(CONFIG_DT_HAS_ZMK_BEHAVIOR_FOCUS_STOP_ENABLED)
+        zephyr_library_sources(src/behaviors/behavior_focus_stop.c)
+endif()
+
 if(CONFIG_SHIELD_FOCUS_DONGLE)
         # The display driver shadows Zephyr's own — see drivers/display/.
         add_subdirectory(${ZEPHYR_CURRENT_MODULE_DIR}/drivers/display)
