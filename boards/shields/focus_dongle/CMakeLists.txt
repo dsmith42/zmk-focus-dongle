@@ -13,5 +13,8 @@ if(CONFIG_SHIELD_FOCUS_DONGLE)
   zephyr_library_include_directories(include)
   zephyr_library_sources(src/brightness.c)
   zephyr_library_sources(src/display_rotate_init.c)
+  # The dial's view model. Display-only — nothing a keymap can reach — so
+  # unlike the timer core this is correctly behind the shield guard.
+  zephyr_library_sources(${ZEPHYR_CURRENT_MODULE_DIR}/src/dial.c)
   zephyr_library_sources(src/status_screen.c)
 endif()
