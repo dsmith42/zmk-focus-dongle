@@ -2,11 +2,11 @@
 # see NOTICE. Changed: the ambient light sensor option now defaults off and says
 # it is unsupported; options for features this module does not have are dropped.
 
-config PROSPECTOR_ROTATE_DISPLAY_180
+config FOCUS_DONGLE_ROTATE_DISPLAY_180
     bool "Rotate the display 180 degrees"
     default n
 
-config PROSPECTOR_USE_AMBIENT_LIGHT_SENSOR
+config FOCUS_DONGLE_USE_AMBIENT_LIGHT_SENSOR
     bool "Use an ambient light sensor for auto brightness"
     default n
     help
@@ -15,8 +15,8 @@ config PROSPECTOR_USE_AMBIENT_LIGHT_SENSOR
       code path has never been tested against hardware. Left here because
       brightness.c still carries the branch. Fixed brightness is the default.
 
-config PROSPECTOR_FIXED_BRIGHTNESS
+config FOCUS_DONGLE_FIXED_BRIGHTNESS
     int "Fixed display brightness"
     default 60
     range 1 100
-    depends on !PROSPECTOR_USE_AMBIENT_LIGHT_SENSOR
+    depends on !FOCUS_DONGLE_USE_AMBIENT_LIGHT_SENSOR

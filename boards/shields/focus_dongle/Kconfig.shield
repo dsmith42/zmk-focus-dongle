@@ -1,0 +1,4 @@
+# Derived from carrefinho/prospector-zmk-module (MIT) — see NOTICE.
+
+config SHIELD_FOCUS_DONGLE
+    def_bool $(shields_list_contains,focus_dongle)

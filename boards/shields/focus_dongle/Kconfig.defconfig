@@ -1,7 +1,7 @@
 # Derived from carrefinho/prospector-zmk-module (MIT) — see NOTICE.
 # Changed: ambient light sensor selects removed.
 
-if SHIELD_PROSPECTOR_ADAPTER
+if SHIELD_FOCUS_DONGLE
 
 config ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING
     default y
