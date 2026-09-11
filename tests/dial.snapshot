@@ -1,0 +1,84 @@
+armed 45, not started
+  numeral      45   dim
+  hand_deg     270
+  track_deg    270
+  wedge_deg    270  dim
+  ring         hidden
+
+armed 90, not started
+  numeral      90   dim
+  hand_deg     180
+  track_deg    360
+  wedge_deg    360  dim
+  ring         180 of 180
+
+running 45 of 45
+  numeral      45   grey
+  hand_deg     270
+  track_deg    270
+  wedge_deg    270  theme
+  ring         hidden
+
+running 21 of 45
+  numeral      21   grey
+  hand_deg     126
+  track_deg    270
+  wedge_deg    126  theme
+  ring         hidden
+
+running 1 of 45
+  numeral      1    grey
+  hand_deg     6
+  track_deg    270
+  wedge_deg    6    theme
+  ring         hidden
+
+running 75 of 90
+  numeral      75   grey
+  hand_deg     90
+  track_deg    360
+  wedge_deg    360  theme
+  ring         90 of 180
+
+running 45 of 90
+  numeral      45   grey
+  hand_deg     270
+  track_deg    360
+  wedge_deg    270  theme
+  ring         0 of 180
+
+exactly zero of 45
+  numeral      0    theme
+  hand_deg     0
+  track_deg    270
+  wedge_deg    0    theme
+  ring         hidden
+
+59 seconds over a 45
+  numeral      0    theme
+  hand_deg     0
+  track_deg    270
+  wedge_deg    0    theme
+  ring         hidden
+
+one minute over a 45
+  numeral      46   theme
+  hand_deg     354
+  track_deg    270
+  wedge_deg    0    theme
+  ring         hidden
+
+overrun 15 past a 45
+  numeral      60   theme
+  hand_deg     270
+  track_deg    270
+  wedge_deg    0    theme
+  ring         hidden
+
+overrun 60 past a 30, hand wraps
+  numeral      90   theme
+  hand_deg     0
+  track_deg    180
+  wedge_deg    0    theme
+  ring         hidden
+

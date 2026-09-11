@@ -32,4 +32,14 @@ endif()
 if(CONFIG_SHIELD_FOCUS_DONGLE)
         # The display driver shadows Zephyr's own — see drivers/display/.
         add_subdirectory(${ZEPHYR_CURRENT_MODULE_DIR}/drivers/display)
+
+        # The dial's view model. Display-only — nothing a keymap can reach — so
+        # unlike the timer core it is correctly behind the shield guard.
+        #
+        # It is compiled HERE rather than in the shield's own CMakeLists because
+        # ZEPHYR_CURRENT_MODULE_DIR is only set while Zephyr's module system is
+        # processing this file. The shield CMakeLists is pulled in by the shield
+        # mechanism instead, where the variable is empty — a source path there
+        # resolved to a bare "/src/dial.c" and failed the dongle build.
+        zephyr_library_sources(src/dial.c)
 endif()

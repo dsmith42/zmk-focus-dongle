@@ -9,7 +9,6 @@ if(CONFIG_SHIELD_FOCUS_DONGLE)
   zephyr_library_include_directories(${ZEPHYR_BASE}/drivers)
   # ZMK's own headers — zmk/display.h and friends live here.
   zephyr_library_include_directories(${CMAKE_SOURCE_DIR}/include)
-  zephyr_library_include_directories(${ZEPHYR_CURRENT_MODULE_DIR}/include)
   zephyr_library_include_directories(include)
   zephyr_library_sources(src/brightness.c)
   zephyr_library_sources(src/display_rotate_init.c)

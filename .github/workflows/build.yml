@@ -41,11 +41,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Timer core
-        run: |
-          cc -std=c99 -Wall -Wextra -Werror -I include -I tests/shim \
-             -o test_timer tests/test_timer.c src/timer.c
-          ./test_timer
+      - name: Host tests
+        run: ./tests/run.sh
 
   # Single stable check for branch protection. Matrix job names are derived from
   # build.yaml and change whenever a target is added, so pinning required checks
