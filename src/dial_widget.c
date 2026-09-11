@@ -78,16 +78,27 @@ static uint32_t hex_of(enum focus_role role) {
     }
 }
 
-/* The hand is ONE colour, always — it never follows the wedge's role.
+/* The hand is always ONE STEP brighter than the wedge it points over.
  *
- * It was briefly written to dim alongside an armed wedge, on the theory that the
- * preview should dim as one piece. On hardware that collapses the hand into the
- * wedge it sits on, and the armed state is precisely when the hand matters most:
- * it is the only thing showing where the block will end.
+ *            wedge                     hand
+ *   armed    scale(wedge, 45%)   ->    wedge            (luma  67 -> 151)
+ *   running  wedge               ->    lighten(wedge)   (luma 151 -> 192)
  *
- * So the hand is an index pointing at the track, not part of the track's state.
- * Constant, set once at init, never touched by the render path. */
-#define DIAL_HAND_COLOR lighten(DIAL_WEDGE, DIAL_HAND_LIFT)
+ * So starting a block lifts the whole assembly by one step rather than changing
+ * one element, which is what the start gesture should look like.
+ *
+ * Two earlier versions were wrong in opposite directions. Making the armed hand
+ * equal its own wedge hid it — and the armed state is precisely when the hand
+ * matters, being the only thing showing where the block will end. Leaving it at
+ * full running brightness put it above even the ACTIVE wedge, so nothing read as
+ * inactive. One step up from whatever is underneath solves both, and needs no
+ * colour that is not already derived from the single wedge a theme declares.
+ *
+ * Note the armed hand and the running wedge are the same value. Different shapes
+ * and never on screen in the same state; confirmed acceptable on hardware. */
+static uint32_t hand_hex_of(enum focus_role wedge_role) {
+    return wedge_role == FOCUS_ROLE_THEME ? lighten(DIAL_WEDGE, DIAL_HAND_LIFT) : DIAL_WEDGE;
+}
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 static struct k_work_delayable dial_tick_work;
@@ -113,6 +124,8 @@ static void render(const struct focus_dial_view *v) {
             lv_color_t wedge = lv_color_hex(hex_of(v->wedge_role));
             lv_obj_set_style_arc_color(widget->arc, wedge, LV_PART_INDICATOR);
             lv_obj_set_style_arc_color(widget->ring, wedge, LV_PART_INDICATOR);
+            lv_obj_set_style_line_color(widget->hand,
+                                        lv_color_hex(hand_hex_of(v->wedge_role)), LV_PART_MAIN);
         }
 
         if (!have_prev || v->numeral_role != prev.numeral_role) {
@@ -296,7 +309,8 @@ int focus_widget_dial_init(struct focus_widget_dial *widget, lv_obj_t *parent) {
     lv_line_set_points(widget->hand, widget->hand_points, 2);
     lv_obj_set_style_line_width(widget->hand, 4, LV_PART_MAIN);
     lv_obj_set_style_line_rounded(widget->hand, true, LV_PART_MAIN);
-    lv_obj_set_style_line_color(widget->hand, lv_color_hex(DIAL_HAND_COLOR), LV_PART_MAIN);
+    lv_obj_set_style_line_color(widget->hand, lv_color_hex(hand_hex_of(FOCUS_ROLE_THEME)),
+                                LV_PART_MAIN);
 
     widget->hub = lv_obj_create(widget->obj);
     lv_obj_set_size(widget->hub, DIAL_HUB_R * 2, DIAL_HUB_R * 2);
