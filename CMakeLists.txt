@@ -42,4 +42,5 @@ if(CONFIG_SHIELD_FOCUS_DONGLE)
         # mechanism instead, where the variable is empty — a source path there
         # resolved to a bare "/src/dial.c" and failed the dongle build.
         zephyr_library_sources(src/dial.c)
+        zephyr_library_sources(src/dial_widget.c)
 endif()
