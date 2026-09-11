@@ -85,6 +85,22 @@ SOFTWARE.
 4. Fonts
 --------------------------------------------------------------------------------
 
-   Generated font sources under boards/shields/*/src/fonts/ are produced from
-   openly licensed typefaces. Each family ships its licence alongside the
-   generated C. See scripts/ for how they are regenerated.
+   Generated font sources under src/fonts/ are produced from openly licensed
+   typefaces. Each family ships its licence alongside the generated C, and
+   scripts/ holds the generators, which are also where the glyph sets are
+   declared.
+
+   Nothing here vendors a whole typeface. The generators download the TTF and
+   bake only the glyphs actually drawn on screen, so what is redistributed is a
+   bitmap subset of an openly licensed face, in the low single-digit KB.
+
+   DINish — The DINish Project Authors — SIL Open Font License 1.1
+
+     https://github.com/playbeing/dinish
+
+     The one Latin family on this display. Licence text at
+     src/fonts/DINish-OFL.txt.
+
+     This replaces the three families the derived tree used, two of which
+     (Foundry Gridnik, FRAC) are commercial and could not be redistributed at
+     all. No part of those ships here.

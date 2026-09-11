@@ -22,6 +22,7 @@
 #include <zmk/event_manager.h>
 
 #include <focus/dial.h>
+#include <focus/fonts.h>
 #include <focus/events/timer_state_changed.h>
 #include <focus/timer.h>
 
@@ -321,14 +322,10 @@ int focus_widget_dial_init(struct focus_widget_dial *widget, lv_obj_t *parent) {
     lv_obj_set_style_border_width(widget->hub, 0, LV_PART_MAIN);
     lv_obj_set_style_pad_all(widget->hub, 0, LV_PART_MAIN);
 
-    /* Minutes top-right. Muted: a check on the dial, not the display.
-     *
-     * Montserrat is a PLACEHOLDER — LVGL ships it, so the geometry rung needs
-     * no font work at all. Rung 3.4 replaces it with a DINish cut, which is the
-     * OFL face already earmarked for every Latin glyph on this screen. */
+    /* Minutes top-right. Muted: a check on the dial, not the display. */
     widget->minutes_label = lv_label_create(widget->obj);
     lv_label_set_text(widget->minutes_label, "0");
-    lv_obj_set_style_text_font(widget->minutes_label, &lv_font_montserrat_28, LV_PART_MAIN);
+    lv_obj_set_style_text_font(widget->minutes_label, &DINish_Medium_32, LV_PART_MAIN);
     lv_obj_set_style_text_color(widget->minutes_label, lv_color_hex(DIAL_GREY), LV_PART_MAIN);
     lv_obj_align(widget->minutes_label, LV_ALIGN_TOP_RIGHT, -10, 22);
 
