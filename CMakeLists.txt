@@ -43,4 +43,8 @@ if(CONFIG_SHIELD_FOCUS_DONGLE)
         # resolved to a bare "/src/dial.c" and failed the dongle build.
         zephyr_library_sources(src/dial.c)
         zephyr_library_sources(src/dial_widget.c)
+
+        # Baked glyph subsets. Display-only, so they sit behind the shield guard
+        # with the widget that draws them. Regenerate with scripts/gen_dinish.sh.
+        zephyr_library_sources(src/fonts/DINish_Medium_32.c)
 endif()
