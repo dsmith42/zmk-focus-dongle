@@ -1,8 +1,9 @@
 /*
- * Minimal dongle shield, used only by CI.
+ * Minimal split PERIPHERAL shield, used only by CI.
  *
- * A dongle is a split central with no keys of its own, and that is all this
- * describes.
+ * Same fictional matrix as the dongle, and the same shared keymap: the point of
+ * this target is that a peripheral compiles every binding the keymap names
+ * while having no display shield, no theme nodes and no dial.
  *
  * The 2x2 matrix is a fiction. ZMK requires a transform and a keymap of
  * matching size; four positions satisfy that and leave room to bind this
@@ -18,13 +19,6 @@
          * zmk_matrix_transform_default through this chosen entry, and the link
          * fails on an undefined reference without it. */
         zmk,matrix-transform = &keymap_transform_0;
-
-        /* The palette a block starts in. It lives HERE, in the consumer's
-         * dongle-only shield, because the theme nodes come from the module's
-         * display overlay: a reference from the shared keymap would fail every
-         * split half with "undefined node label", and the peripheral target
-         * next door exists to prove that stays true. */
-        zmk,focus-theme = &focus_violet;
     };
 
     keymap_transform_0: keymap_transform_0 {

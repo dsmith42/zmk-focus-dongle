@@ -29,6 +29,14 @@ if(CONFIG_DT_HAS_ZMK_BEHAVIOR_FOCUS_STOP_ENABLED)
         zephyr_library_sources(src/behaviors/behavior_focus_stop.c)
 endif()
 
+# Selecting a palette is a display concern, but the binding lives in the shared
+# keymap like the others -- a split peripheral compiles that keymap and has to
+# resolve the node. The behaviour only touches the timer core, which every
+# target builds, so nothing here is display-gated.
+if(CONFIG_DT_HAS_ZMK_BEHAVIOR_FOCUS_THEME_ENABLED)
+        zephyr_library_sources(src/behaviors/behavior_focus_theme.c)
+endif()
+
 if(CONFIG_SHIELD_FOCUS_DONGLE)
         # The display driver shadows Zephyr's own — see drivers/display/.
         add_subdirectory(${ZEPHYR_CURRENT_MODULE_DIR}/drivers/display)

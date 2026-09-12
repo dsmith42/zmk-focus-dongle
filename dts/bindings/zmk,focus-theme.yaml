@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: MIT
+
+description: |
+  A palette for the dial.
+
+  A theme declares ONE colour: the wedge. Everything else on the dial is derived
+  from it — the armed preview is a dimmed wedge, the hand is one step brighter
+  than whatever it points over — so a palette cannot be internally inconsistent
+  and adding one is a single line.
+
+  Deliberately NOT per-theme: the layer name, the modifier row, the battery
+  colours and the structural greys of the face. Those are keyboard state and
+  furniture; only the dial carries the palette, so switching theme mid-session
+  changes one thing rather than repainting the screen.
+
+  The themes this module ships are named for their colours and mean nothing on
+  their own. What a colour stands for is the user's business: a mode, a project,
+  a mood, or nothing at all. (The author's own mapping — one colour per type of
+  focus block — is in the README as an example, not as a rule.)
+
+compatible: "zmk,focus-theme"
+
+properties:
+  index:
+    type: int
+    required: true
+    description: |
+      What `&focus_theme N` selects. Explicit rather than positional, because a
+      consumer can add a theme node of their own and the numbers a keymap binds
+      must not shift underneath them when they do.
+
+  wedge:
+    type: int
+    required: true
+    description: |
+      The dial's colour, as 0xRRGGBB. Pick something that reads at a glance on a
+      black panel at partial brightness; everything else is derived from it.
+
+  label:
+    type: string
+    required: true
+    description: |
+      A human name for the colour. Nothing on the panel draws it — the screen is
+      too narrow for a word next to the dial, and a colour you chose needs no
+      caption. It exists so the documentation table can be generated from the
+      themes themselves rather than maintained beside them.

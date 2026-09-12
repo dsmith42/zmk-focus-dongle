@@ -35,6 +35,15 @@
             compatible = "zmk,behavior-focus-stop";
             #binding-cells = <0>;
         };
+
+        /* Selecting a palette is display-facing, but the node belongs here with
+         * the others: the peripherals compile this keymap and must resolve
+         * every binding in it. The behaviour only touches the timer core, which
+         * every target builds, so it links on a board with no screen. */
+        focus_theme: focus_theme {
+            compatible = "zmk,behavior-focus-theme";
+            #binding-cells = <1>;
+        };
     };
 
     keymap {
@@ -44,7 +53,7 @@
             display-name = "Base";
             bindings = <
 &focus 45    &focus_start
-&focus_stop  &none
+&focus_stop  &focus_theme 2
             >;
         };
     };

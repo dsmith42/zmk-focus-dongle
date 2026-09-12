@@ -3,5 +3,71 @@
 / {
    chosen {
       zephyr,display = &st7789;
-  };
+
+      /*
+       * NO DEFAULT THEME HERE, deliberately.
+       *
+       * ZMK applies shield overlays in the order they are listed, so with
+       * `shield: my_dongle focus_dongle` this file is applied LAST and a chosen
+       * entry written here would silently override the consumer's. The fallback
+       * lives in src/theme.c instead: with no chosen node, the first declared
+       * palette is used.
+       *
+       * A consumer sets it in their own DONGLE overlay, never in the keymap —
+       * these nodes come from this file, which only the dongle build applies,
+       * so a reference from the shared keymap fails every split half with
+       * "undefined node label".
+       */
+   };
+
+   /*
+    * Six palettes, named for their colours and meaning nothing on their own.
+    * `&focus_theme N` picks one by its index, and what that stands for is the
+    * user's business — see the README for one worked example.
+    *
+    * Each declares only its wedge. The armed preview and the hand are derived
+    * from it in src/theme.c, so a palette cannot be internally inconsistent and
+    * a seventh is one node.
+    */
+   focus_teal: focus_teal {
+      compatible = "zmk,focus-theme";
+      index = <0>;
+      wedge = <0x1ABC9C>;
+      label = "Teal";
+   };
+
+   focus_red: focus_red {
+      compatible = "zmk,focus-theme";
+      index = <1>;
+      wedge = <0xE74C3C>;
+      label = "Red";
+   };
+
+   focus_blue: focus_blue {
+      compatible = "zmk,focus-theme";
+      index = <2>;
+      wedge = <0x3B82F6>;
+      label = "Blue";
+   };
+
+   focus_amber: focus_amber {
+      compatible = "zmk,focus-theme";
+      index = <3>;
+      wedge = <0xFFB020>;
+      label = "Amber";
+   };
+
+   focus_violet: focus_violet {
+      compatible = "zmk,focus-theme";
+      index = <4>;
+      wedge = <0x8E6BF7>;
+      label = "Violet";
+   };
+
+   focus_green: focus_green {
+      compatible = "zmk,focus-theme";
+      index = <5>;
+      wedge = <0x2ECC71>;
+      label = "Green";
+   };
 };

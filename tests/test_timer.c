@@ -219,6 +219,37 @@ static void test_ignored_calls_raise_nothing(void) {
     CHECK_EQ(events, 0);
 }
 
+/* The theme is the one thing that may change mid-block, because it is metadata
+ * rather than timing: nothing about it can destroy elapsed time, and realising
+ * halfway through that a block is something else is a real correction to want.
+ * This asymmetry with arm/start is deliberate — see focus/timer.h. */
+static void test_theme_can_change_while_a_block_runs(void) {
+    reset("the palette can change mid-block");
+    focus_timer_set_theme(2);
+    focus_timer_start(45);
+    advance(20);
+    focus_timer_set_theme(4);
+    CHECK_EQ(read().theme, 4);
+    CHECK(read().running);
+    CHECK_EQ(read().remaining_ms, MIN(25)); /* untouched by the change */
+}
+
+static void test_theme_survives_a_block(void) {
+    reset("the palette survives a block");
+    focus_timer_set_theme(3);
+    focus_timer_start(20);
+    advance(20);
+    focus_timer_stop();
+    CHECK_EQ(read().theme, 3);
+}
+
+static void test_theme_change_raises_an_event(void) {
+    reset("selecting a palette raises an event");
+    events = 0;
+    focus_timer_set_theme(1);
+    CHECK_EQ(events, 1);
+}
+
 int main(void) {
     test_stopped_is_quiet();
     test_start_sets_deadline();
@@ -235,6 +266,9 @@ int main(void) {
     test_arm_zero_ignored();
     test_events_are_raised();
     test_ignored_calls_raise_nothing();
+    test_theme_can_change_while_a_block_runs();
+    test_theme_survives_a_block();
+    test_theme_change_raises_an_event();
 
     if (failures) {
         printf("\n%d check(s) failed\n", failures);

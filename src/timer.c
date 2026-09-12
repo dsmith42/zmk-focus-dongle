@@ -13,6 +13,11 @@ static bool running;
  * a power cycle is a fresh state, like everything else here. */
 static uint16_t armed_minutes = 45;
 
+/* The palette, as a bare number. This file builds on every target, including
+ * split peripherals with no screen, so it must not reach for devicetree's
+ * chosen theme — the display owns that and sets it when the widget comes up. */
+static uint8_t theme;
+
 /* A block stays locked past its deadline, not just up to it. Overrun is data —
  * it is read when the block is logged — so it must survive until it is
  * deliberately dismissed. Releasing the lock at zero would let a stray start
@@ -68,8 +73,16 @@ void focus_timer_arm(uint16_t minutes) {
 
 void focus_timer_start_armed(void) { focus_timer_start(armed_minutes); }
 
+void focus_timer_set_theme(uint8_t new_theme) {
+    /* No running check, deliberately — see the header. */
+    theme = new_theme;
+
+    raise_changed();
+}
+
 void focus_timer_get(struct focus_timer_state *out) {
     out->armed_minutes = armed_minutes;
+    out->theme = theme;
     out->running = running;
     out->total_ms = total_ms;
 

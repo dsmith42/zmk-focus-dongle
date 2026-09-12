@@ -50,6 +50,8 @@ static int hand_deg_of(int face_minutes) {
 struct focus_dial_view focus_dial_view_of(const struct focus_timer_state *state) {
     struct focus_dial_view v = {0};
 
+    v.theme = state->theme;
+
     /* Not running: preview the armed length at full extent, dimmed. Choosing a
      * length is visible rather than a hidden mode. */
     if (!state->running) {

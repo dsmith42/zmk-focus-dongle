@@ -46,6 +46,12 @@ struct focus_dial_view {
     int ring_wedge_deg;
 
     enum focus_role wedge_role;
+
+    /* Which palette draws this block. MODEL data: the view model passes it
+     * through and never resolves it, so a teal build and a red build produce
+     * byte-identical view models and the snapshot asserts an index rather than
+     * a colour. */
+    uint8_t theme;
 };
 
 struct focus_dial_view focus_dial_view_of(const struct focus_timer_state *state);

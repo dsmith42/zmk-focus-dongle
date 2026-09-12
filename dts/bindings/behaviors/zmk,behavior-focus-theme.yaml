@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: MIT
+
+description: |
+  Select the dial's palette by index.
+
+  The index is a theme node's `index` property, not its position in devicetree —
+  so adding a palette of your own cannot renumber the ones a keymap already
+  binds.
+
+  Unlike arming and starting, this works WHILE A BLOCK IS RUNNING. Length and
+  elapsed time are the data a stray keypress must not destroy; a colour destroys
+  nothing, and changing your mind about what a block is halfway through is a
+  real thing that happens.
+
+  An index with no theme behind it draws the default palette rather than
+  nothing: a wrong colour is a visible mistake, a black dial looks like a crash.
+
+compatible: "zmk,behavior-focus-theme"
+
+include: one_param.yaml
