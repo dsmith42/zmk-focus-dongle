@@ -5,9 +5,10 @@
  * LVGL, no devicetree, no colours — the widget applies this and decides
  * nothing, which is what makes both host-testable.
  *
- * Colours are ROLES, not values. The theme mapping happens at the widget, so
- * this layer stays theme-independent: an amber build and a teal build produce
- * identical view models, and adding a theme cannot break a test.
+ * Colours are ROLES, not values — see focus/role.h. The mapping to hex happens
+ * at the widget, so this layer stays theme-independent: an amber build and a
+ * teal build produce identical view models, and adding a theme cannot break a
+ * test.
  */
 
 #pragma once
@@ -15,6 +16,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <focus/role.h>
 #include <focus/timer.h>
 
 /* The disc is an absolute 60 minute face. Longer blocks spill onto the overflow
@@ -23,12 +25,6 @@
 
 /* One disc plus one ring, so two hours is the ceiling. */
 #define FOCUS_DIAL_MAX_MINUTES 120
-
-enum focus_role {
-    FOCUS_ROLE_THEME, /* the wedge colour, at full strength */
-    FOCUS_ROLE_DIM,   /* armed but not started */
-    FOCUS_ROLE_GREY,  /* the resting colour for the numeral */
-};
 
 struct focus_dial_view {
     /* The number to print. Minutes remaining while a block runs, rounded UP so

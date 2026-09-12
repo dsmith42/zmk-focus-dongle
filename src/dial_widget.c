@@ -23,83 +23,14 @@
 
 #include <focus/dial.h>
 #include <focus/fonts.h>
+#include <focus/theme.h>
 #include <focus/events/timer_state_changed.h>
 #include <focus/timer.h>
 
-/*
- * ONE THEME, HARDCODED — rung 3.3b.
- *
- * Themes are a later rung. The seam that makes them cheap is hex_of() below:
- * today its body returns constants, later it indexes a table built from
- * devicetree, and nothing else in this file changes. Keeping every colour
- * behind it is the whole reason multi-theme stays a one-function change.
- */
-#define DIAL_WEDGE 0x1ABC9C /* teal — the public default */
-#define DIAL_FACE 0x242424  /* the whole hour, behind everything */
-#define DIAL_BLOCK 0x3A3A3A /* the length chosen, behind the wedge */
-#define DIAL_TICK 0x9A9A9A
-#define DIAL_HUB 0xD8D4CC
-#define DIAL_GREY 0x8A8A8A /* the resting numeral */
-
-/* The hand and the armed preview are DERIVED from the wedge rather than set
- * per theme: one rule for every palette, nothing to drift, and a new theme only
- * has to declare its wedge. Keep these derivations in here — let them leak into
- * the render path and the coupling the roles removed comes straight back. */
-#define DIAL_HAND_LIFT 40   /* percent toward white */
-#define DIAL_ARMED_LEVEL 45 /* percent of the wedge */
-
-static uint32_t lighten(uint32_t c, int pct) {
-    uint32_t r = (c >> 16) & 0xff, g = (c >> 8) & 0xff, b = c & 0xff;
-
-    r += ((255 - r) * pct) / 100;
-    g += ((255 - g) * pct) / 100;
-    b += ((255 - b) * pct) / 100;
-
-    return (r << 16) | (g << 8) | b;
-}
-
-static uint32_t scale(uint32_t c, int pct) {
-    uint32_t r = (((c >> 16) & 0xff) * pct) / 100;
-    uint32_t g = (((c >> 8) & 0xff) * pct) / 100;
-    uint32_t b = ((c & 0xff) * pct) / 100;
-
-    return (r << 16) | (g << 8) | b;
-}
-
-/* The single seam between roles and values. */
-static uint32_t hex_of(enum focus_role role) {
-    switch (role) {
-    case FOCUS_ROLE_THEME:
-        return DIAL_WEDGE;
-    case FOCUS_ROLE_DIM:
-        return scale(DIAL_WEDGE, DIAL_ARMED_LEVEL);
-    case FOCUS_ROLE_GREY:
-    default:
-        return DIAL_GREY;
-    }
-}
-
-/* The hand is always ONE STEP brighter than the wedge it points over.
- *
- *            wedge                     hand
- *   armed    scale(wedge, 45%)   ->    wedge            (luma  67 -> 151)
- *   running  wedge               ->    lighten(wedge)   (luma 151 -> 192)
- *
- * So starting a block lifts the whole assembly by one step rather than changing
- * one element, which is what the start gesture should look like.
- *
- * Two earlier versions were wrong in opposite directions. Making the armed hand
- * equal its own wedge hid it — and the armed state is precisely when the hand
- * matters, being the only thing showing where the block will end. Leaving it at
- * full running brightness put it above even the ACTIVE wedge, so nothing read as
- * inactive. One step up from whatever is underneath solves both, and needs no
- * colour that is not already derived from the single wedge a theme declares.
- *
- * Note the armed hand and the running wedge are the same value. Different shapes
- * and never on screen in the same state; confirmed acceptable on hardware. */
-static uint32_t hand_hex_of(enum focus_role wedge_role) {
-    return wedge_role == FOCUS_ROLE_THEME ? lighten(DIAL_WEDGE, DIAL_HAND_LIFT) : DIAL_WEDGE;
-}
+/* Colours live in focus/theme.h — including the derivations, so that letting
+ * one leak into a render path here cannot quietly recreate the coupling the
+ * roles removed. The dial names only the structural greys it paints once at
+ * construction: FOCUS_COLOR_FACE, _BLOCK, _TICK and _HUB. */
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 static struct k_work_delayable dial_tick_work;
@@ -122,16 +53,16 @@ static void render(const struct focus_dial_view *v) {
     struct focus_widget_dial *widget;
     SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) {
         if (!have_prev || v->wedge_role != prev.wedge_role) {
-            lv_color_t wedge = lv_color_hex(hex_of(v->wedge_role));
+            lv_color_t wedge = lv_color_hex(focus_hex_of(v->wedge_role));
             lv_obj_set_style_arc_color(widget->arc, wedge, LV_PART_INDICATOR);
             lv_obj_set_style_arc_color(widget->ring, wedge, LV_PART_INDICATOR);
             lv_obj_set_style_line_color(widget->hand,
-                                        lv_color_hex(hand_hex_of(v->wedge_role)), LV_PART_MAIN);
+                                        lv_color_hex(focus_hand_hex(v->wedge_role)), LV_PART_MAIN);
         }
 
         if (!have_prev || v->numeral_role != prev.numeral_role) {
             lv_obj_set_style_text_color(widget->minutes_label,
-                                        lv_color_hex(hex_of(v->numeral_role)), LV_PART_MAIN);
+                                        lv_color_hex(focus_hex_of(v->numeral_role)), LV_PART_MAIN);
         }
 
         /* Grey track spans the BLOCK, not the face, so a 45 leaves a black
@@ -234,7 +165,7 @@ int focus_widget_dial_init(struct focus_widget_dial *widget, lv_obj_t *parent) {
         widget->ticks[i] = lv_obj_create(widget->obj);
         lv_obj_set_size(widget->ticks[i], 3, 3);
         lv_obj_set_pos(widget->ticks[i], mx - 1, my - 1);
-        lv_obj_set_style_bg_color(widget->ticks[i], lv_color_hex(DIAL_TICK), LV_PART_MAIN);
+        lv_obj_set_style_bg_color(widget->ticks[i], lv_color_hex(FOCUS_COLOR_TICK), LV_PART_MAIN);
         lv_obj_set_style_bg_opa(widget->ticks[i], LV_OPA_COVER, LV_PART_MAIN);
         lv_obj_set_style_border_width(widget->ticks[i], 0, LV_PART_MAIN);
         lv_obj_set_style_radius(widget->ticks[i], 2, LV_PART_MAIN);
@@ -248,7 +179,7 @@ int focus_widget_dial_init(struct focus_widget_dial *widget, lv_obj_t *parent) {
     lv_obj_set_size(widget->face, DIAL_R * 2, DIAL_R * 2);
     lv_obj_set_pos(widget->face, DIAL_CX - DIAL_R, DIAL_CY - DIAL_R);
     lv_obj_set_style_radius(widget->face, LV_RADIUS_CIRCLE, LV_PART_MAIN);
-    lv_obj_set_style_bg_color(widget->face, lv_color_hex(DIAL_FACE), LV_PART_MAIN);
+    lv_obj_set_style_bg_color(widget->face, lv_color_hex(FOCUS_COLOR_FACE), LV_PART_MAIN);
     lv_obj_set_style_bg_opa(widget->face, LV_OPA_COVER, LV_PART_MAIN);
     lv_obj_set_style_border_width(widget->face, 0, LV_PART_MAIN);
     lv_obj_set_style_pad_all(widget->face, 0, LV_PART_MAIN);
@@ -262,7 +193,7 @@ int focus_widget_dial_init(struct focus_widget_dial *widget, lv_obj_t *parent) {
     lv_arc_set_bg_angles(widget->face_ring, 0, 360);
     lv_arc_set_angles(widget->face_ring, 0, 0);
     lv_obj_set_style_arc_width(widget->face_ring, DIAL_RING_W, LV_PART_MAIN);
-    lv_obj_set_style_arc_color(widget->face_ring, lv_color_hex(DIAL_FACE), LV_PART_MAIN);
+    lv_obj_set_style_arc_color(widget->face_ring, lv_color_hex(FOCUS_COLOR_FACE), LV_PART_MAIN);
     lv_obj_set_style_arc_opa(widget->face_ring, LV_OPA_TRANSP, LV_PART_INDICATOR);
     lv_obj_set_style_bg_opa(widget->face_ring, LV_OPA_TRANSP, LV_PART_MAIN);
     lv_obj_set_style_border_width(widget->face_ring, 0, LV_PART_MAIN);
@@ -280,8 +211,9 @@ int focus_widget_dial_init(struct focus_widget_dial *widget, lv_obj_t *parent) {
     lv_arc_set_angles(widget->arc, 0, 0);
     lv_obj_set_style_arc_width(widget->arc, DIAL_R, LV_PART_MAIN);
     lv_obj_set_style_arc_width(widget->arc, DIAL_R, LV_PART_INDICATOR);
-    lv_obj_set_style_arc_color(widget->arc, lv_color_hex(DIAL_BLOCK), LV_PART_MAIN);
-    lv_obj_set_style_arc_color(widget->arc, lv_color_hex(DIAL_WEDGE), LV_PART_INDICATOR);
+    lv_obj_set_style_arc_color(widget->arc, lv_color_hex(FOCUS_COLOR_BLOCK), LV_PART_MAIN);
+    lv_obj_set_style_arc_color(widget->arc, lv_color_hex(focus_hex_of(FOCUS_ROLE_THEME)),
+                               LV_PART_INDICATOR);
     lv_obj_set_style_bg_opa(widget->arc, LV_OPA_TRANSP, LV_PART_MAIN);
     lv_obj_set_style_border_width(widget->arc, 0, LV_PART_MAIN);
 
@@ -295,8 +227,9 @@ int focus_widget_dial_init(struct focus_widget_dial *widget, lv_obj_t *parent) {
     lv_arc_set_angles(widget->ring, 0, 0);
     lv_obj_set_style_arc_width(widget->ring, DIAL_RING_W, LV_PART_MAIN);
     lv_obj_set_style_arc_width(widget->ring, DIAL_RING_W, LV_PART_INDICATOR);
-    lv_obj_set_style_arc_color(widget->ring, lv_color_hex(DIAL_BLOCK), LV_PART_MAIN);
-    lv_obj_set_style_arc_color(widget->ring, lv_color_hex(DIAL_WEDGE), LV_PART_INDICATOR);
+    lv_obj_set_style_arc_color(widget->ring, lv_color_hex(FOCUS_COLOR_BLOCK), LV_PART_MAIN);
+    lv_obj_set_style_arc_color(widget->ring, lv_color_hex(focus_hex_of(FOCUS_ROLE_THEME)),
+                               LV_PART_INDICATOR);
     lv_obj_set_style_bg_opa(widget->ring, LV_OPA_TRANSP, LV_PART_MAIN);
     lv_obj_set_style_border_width(widget->ring, 0, LV_PART_MAIN);
     lv_obj_add_flag(widget->ring, LV_OBJ_FLAG_HIDDEN);
@@ -310,14 +243,14 @@ int focus_widget_dial_init(struct focus_widget_dial *widget, lv_obj_t *parent) {
     lv_line_set_points(widget->hand, widget->hand_points, 2);
     lv_obj_set_style_line_width(widget->hand, 4, LV_PART_MAIN);
     lv_obj_set_style_line_rounded(widget->hand, true, LV_PART_MAIN);
-    lv_obj_set_style_line_color(widget->hand, lv_color_hex(hand_hex_of(FOCUS_ROLE_THEME)),
+    lv_obj_set_style_line_color(widget->hand, lv_color_hex(focus_hand_hex(FOCUS_ROLE_THEME)),
                                 LV_PART_MAIN);
 
     widget->hub = lv_obj_create(widget->obj);
     lv_obj_set_size(widget->hub, DIAL_HUB_R * 2, DIAL_HUB_R * 2);
     lv_obj_set_pos(widget->hub, DIAL_CX - DIAL_HUB_R, DIAL_CY - DIAL_HUB_R);
     lv_obj_set_style_radius(widget->hub, LV_RADIUS_CIRCLE, LV_PART_MAIN);
-    lv_obj_set_style_bg_color(widget->hub, lv_color_hex(DIAL_HUB), LV_PART_MAIN);
+    lv_obj_set_style_bg_color(widget->hub, lv_color_hex(FOCUS_COLOR_HUB), LV_PART_MAIN);
     lv_obj_set_style_bg_opa(widget->hub, LV_OPA_COVER, LV_PART_MAIN);
     lv_obj_set_style_border_width(widget->hub, 0, LV_PART_MAIN);
     lv_obj_set_style_pad_all(widget->hub, 0, LV_PART_MAIN);
@@ -326,7 +259,8 @@ int focus_widget_dial_init(struct focus_widget_dial *widget, lv_obj_t *parent) {
     widget->minutes_label = lv_label_create(widget->obj);
     lv_label_set_text(widget->minutes_label, "0");
     lv_obj_set_style_text_font(widget->minutes_label, &DINish_Medium_32, LV_PART_MAIN);
-    lv_obj_set_style_text_color(widget->minutes_label, lv_color_hex(DIAL_GREY), LV_PART_MAIN);
+    lv_obj_set_style_text_color(widget->minutes_label,
+                                lv_color_hex(focus_hex_of(FOCUS_ROLE_GREY)), LV_PART_MAIN);
     lv_obj_align(widget->minutes_label, LV_ALIGN_TOP_RIGHT, -10, 22);
 
     sys_slist_append(&widgets, &widget->node);

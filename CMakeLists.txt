@@ -44,6 +44,9 @@ if(CONFIG_SHIELD_FOCUS_DONGLE)
         zephyr_library_sources(src/dial.c)
         zephyr_library_sources(src/dial_widget.c)
 
+        # Role -> colour, shared by both widgets. The one place a theme changes.
+        zephyr_library_sources(src/theme.c)
+
         # Baked glyph subsets. Display-only, so they sit behind the shield guard
         # with the widgets that draw them. Regenerate with scripts/gen_fonts.sh.
         zephyr_library_sources(src/fonts/DINish_Medium_32.c)
