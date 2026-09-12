@@ -77,13 +77,25 @@ def rgb(c):
     return ((c >> 16) & 0xFF, (c >> 8) & 0xFF, c & 0xFF)
 
 
-WEDGE = need(THEME, "THEME_WEDGE", "src/theme.c")
 ARMED_LEVEL = need(THEME, "THEME_ARMED_LEVEL", "src/theme.c")
 HAND_LIFT = need(THEME, "THEME_HAND_LIFT", "src/theme.c")
 
-ROLE = {
-    "theme": rgb(WEDGE),
-    "dim": scale(WEDGE, ARMED_LEVEL),
+# The palettes, read from the overlay that ships them rather than restated here.
+PALETTES = [
+    {"index": int(m["index"]), "wedge": int(m["wedge"], 0), "label": m["label"]}
+    for m in re.finditer(
+        r"index\s*=\s*<(?P<index>\d+)>;\s*"
+        r"wedge\s*=\s*<(?P<wedge>0[xX][0-9a-fA-F]+)>;\s*"
+        r'label\s*=\s*"(?P<label>[^"]+)";',
+        read("boards/shields/focus_dongle/focus_dongle.overlay"),
+    )
+]
+if not PALETTES:
+    sys.exit("no zmk,focus-theme nodes found — update docs/render_screen.py")
+
+# Everything that is NOT the palette. The dial carries the block's colour; these
+# are keyboard state and furniture, identical in every theme.
+FIXED_ROLES = {
     "grey": rgb(need(THEME, "THEME_GREY", "src/theme.c")),
     "accent": rgb(need(THEME, "THEME_ACCENT", "src/theme.c")),
     "idle": rgb(need(THEME, "THEME_IDLE", "src/theme.c")),
@@ -96,8 +108,25 @@ TICK = rgb(need(THEME, "FOCUS_COLOR_TICK", "focus/theme.h"))
 HUB = rgb(need(THEME, "FOCUS_COLOR_HUB", "focus/theme.h"))
 
 
-def hand_colour(wedge_role):
-    return lighten(WEDGE, HAND_LIFT) if wedge_role == "theme" else rgb(WEDGE)
+def wedge_of(theme):
+    for p in PALETTES:
+        if p["index"] == theme:
+            return p["wedge"]
+    return PALETTES[0]["wedge"]
+
+
+def role_colour(role, theme):
+    """The same mapping src/theme.c makes, including its two derivations."""
+    if role == "theme":
+        return rgb(wedge_of(theme))
+    if role == "dim":
+        return scale(wedge_of(theme), ARMED_LEVEL)
+    return FIXED_ROLES[role]
+
+
+def hand_colour(wedge_role, theme):
+    wedge = wedge_of(theme)
+    return lighten(wedge, HAND_LIFT) if wedge_role == "theme" else rgb(wedge)
 
 
 # --- fonts, from the generator --------------------------------------------
@@ -173,7 +202,7 @@ def arc_box(r):
     return [CX - r, CY - r, CX + r, CY + r]
 
 
-def draw_dial(d, st):
+def draw_dial(d, st, theme):
     for i in range(TICKS):
         a = radians(360 * i / TICKS - 90)
         mid = TICK_IN + (TICK_OUT - TICK_IN) / 2
@@ -185,48 +214,49 @@ def draw_dial(d, st):
 
     wedge_deg, wedge_role = st["wedge_deg"]
     if wedge_deg:
-        d.pieslice(arc_box(R), -90, -90 + wedge_deg, fill=ROLE[wedge_role])
+        d.pieslice(arc_box(R), -90, -90 + wedge_deg, fill=role_colour(wedge_role, theme))
 
     if st["ring"]:
         ring_wedge, ring_track = st["ring"]
         d.arc(arc_box(RING_R), -90, -90 + ring_track, fill=BLOCK, width=RING_W)
         if ring_wedge:
-            d.arc(arc_box(RING_R), -90, -90 + ring_wedge, fill=ROLE[wedge_role], width=RING_W)
+            d.arc(arc_box(RING_R), -90, -90 + ring_wedge, fill=role_colour(wedge_role, theme),
+                  width=RING_W)
 
     a = radians(st["hand_deg"] - 90)
     d.line([CX, CY, CX + HAND_R * cos(a), CY + HAND_R * sin(a)],
-           fill=hand_colour(wedge_role), width=4)
+           fill=hand_colour(wedge_role, theme), width=4)
     d.ellipse([CX - HUB_R, CY - HUB_R, CX + HUB_R, CY + HUB_R], fill=HUB)
 
     numeral, numeral_role = st["numeral"]
     d.text((PANEL[0] - INSET, 22), str(numeral), font=font("DINish_Medium_32"),
-           fill=ROLE[numeral_role], anchor="rt")
+           fill=role_colour(numeral_role, theme), anchor="rt")
 
 
 def draw_status(d, layer, profile, batteries, held):
     d.text((PANEL[0] - INSET, PROFILE_Y), profile, font=font("DINish_Medium_24"),
-           fill=ROLE["grey"], anchor="rt")
+           fill=FIXED_ROLES["grey"], anchor="rt")
 
     for i, level in enumerate(batteries):
         x = PANEL[0] - INSET - (len(batteries) - 1 - i) * BATTERY_PITCH
         d.text((x, BATTERY_Y), str(level), font=font("DINish_Medium_24"),
-               fill=ROLE["low" if level < 15 else "ok"], anchor="rt")
+               fill=FIXED_ROLES["low" if level < 15 else "ok"], anchor="rt")
 
     d.text((CORNER, PANEL[1] + MODS_Y - 3), layer.upper(),
-           font=font("DINish_Medium_20"), fill=ROLE["accent"], anchor="ls")
+           font=font("DINish_Medium_20"), fill=FIXED_ROLES["accent"], anchor="ls")
 
     for i, glyph in enumerate(MOD_GLYPHS):
         x = PANEL[0] - CORNER - (len(MOD_GLYPHS) - 1 - i) * MODS_PITCH
         # LVGL's y grows downward, so the widget's +CARET_DROP is a drop here too.
         y = PANEL[1] + MODS_Y + (CARET_DROP if glyph == "\u2303" else 0)
         d.text((x, y), glyph, font=font("JuliaMono_Regular_28"),
-               fill=ROLE["accent" if held[i] else "idle"], anchor="rs")
+               fill=FIXED_ROLES["accent" if held[i] else "idle"], anchor="rs")
 
 
-def render(state, layer, profile, batteries, held):
+def render(state, layer, profile, batteries, held, theme=0):
     img = Image.new("RGB", PANEL, (0, 0, 0))
     d = ImageDraw.Draw(img)
-    draw_dial(d, state)
+    draw_dial(d, state, theme)
     draw_status(d, layer, profile, batteries, held)
     return img
 
@@ -242,6 +272,10 @@ SCENES = [
 # the text sits), in PANEL coordinates — the arrows are drawn to the real
 # positions the constants above produce, so a moved element drags its label.
 LEGEND_SCENE = ("running 21 of 45", "Base", "1", [84, 61], [1, 1, 0, 0])
+
+# One image per palette, all showing the same block so the only difference on
+# screen is the colour — which is the point being illustrated.
+PALETTE_SCENE = ("running 42 of 60", "Base", "1", [84, 61], [0, 0, 0, 0])
 CALLOUTS = [
     # Each leader starts just OUTSIDE its element and exits the nearer edge, so
     # no line is ever drawn through the thing it is naming.
@@ -294,6 +328,15 @@ def main():
         img.resize((PANEL[0] * 2, PANEL[1] * 2), Image.LANCZOS).save(
             path.replace(".png", "@2x.png"))
         print(f"wrote {os.path.relpath(path, ROOT)}")
+
+    label, *scene = PALETTE_SCENE
+    if label not in states:
+        sys.exit(f"'{label}' is no longer in tests/dial.snapshot — update PALETTE_SCENE")
+    for palette in PALETTES:
+        img = render(states[label], *scene, theme=palette["index"])
+        stem = palette["label"].lower()
+        img.save(os.path.join(outdir, f"theme-{stem}.png"))
+        print(f"wrote docs/images/theme-{stem}.png")
 
     legend = render_legend(states[LEGEND_SCENE[0]])
     path = os.path.join(outdir, "screen-legend.png")
