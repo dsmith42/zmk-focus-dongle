@@ -40,7 +40,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      # v4 ran on Node 20, which the runners now force onto Node 24 and warn
+      # about. v5 was the first Node 24 release; v7 is current. v6's breaking
+      # change only affects pull_request_target, which this workflow does not
+      # use — see the `on:` block above, and the reason it does not.
+      - uses: actions/checkout@v7
       - name: Host tests
         run: ./tests/run.sh
 
