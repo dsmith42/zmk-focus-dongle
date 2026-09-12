@@ -93,7 +93,7 @@ generate "DINish_Medium_32" "$DINISH" 32 "0123456789" "dial numeral"
 
 # The layer label, and the two text forms of the profile indicator ("USB", and
 # the "B n" fallback past the circled digits). Printable ASCII, because the layer
-# name comes from the consumer's keymap: baking only the characters Dan's keymap
+# name comes from the consumer's keymap: baking only the characters one keymap
 # uses would give everyone else tofu, on a device with no log to explain it.
 # Costs ~4 KB against ~380 KB of free flash.
 generate "DINish_Medium_20" "$DINISH" 20 "0x20-0x7E" "layer label"
