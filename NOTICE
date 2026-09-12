@@ -112,3 +112,12 @@ SOFTWARE.
      Five circled digits, ①..⑤, which the BLE profile indicator is drawn with.
      No Latin text face carries them; this one does, and is openly licensed.
      Licence text at src/fonts/NotoSansSymbols-OFL.txt.
+
+   JuliaMono — The JuliaMono Project Authors — SIL Open Font License 1.1
+
+     https://github.com/cormullion/juliamono
+
+     Four modifier glyphs, ⌘⌥⌃⇧. It is the only openly licensed face found to
+     carry all four, which is what let this module drop Apple's private-use
+     codepoints without merging two families at mismatched optical sizes.
+     Licence text at src/fonts/JuliaMono-OFL.txt.

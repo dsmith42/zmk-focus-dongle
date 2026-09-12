@@ -31,6 +31,8 @@ static const char *role(enum focus_role r) {
         return "grey";
     case FOCUS_ROLE_ACCENT:
         return "accent";
+    case FOCUS_ROLE_IDLE:
+        return "idle";
     case FOCUS_ROLE_OK:
         return "ok";
     case FOCUS_ROLE_LOW:

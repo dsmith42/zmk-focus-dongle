@@ -45,11 +45,40 @@ enum focus_profile_form {
  * that can be drawn as one. */
 #define FOCUS_PROFILE_CIRCLED_MAX 5
 
+/* The four modifier glyphs, drawn in GACS order: ⌘ ⌥ ⌃ ⇧.
+ *
+ * Left and right collapse into one glyph each. The screen answers "is a
+ * modifier held", which is what a chord means; which physical key produced it
+ * is not information anyone reads off a dongle. */
+#define FOCUS_MOD_COUNT 4
+
+enum focus_mod {
+    FOCUS_MOD_GUI,
+    FOCUS_MOD_ALT,
+    FOCUS_MOD_CTRL,
+    FOCUS_MOD_SHIFT,
+};
+
+/* USB HID modifier bit positions — the specification's own numbering, so the
+ * view model needs no ZMK header and the host tests can build the byte by
+ * hand. */
+#define FOCUS_HID_LCTL (1u << 0)
+#define FOCUS_HID_LSFT (1u << 1)
+#define FOCUS_HID_LALT (1u << 2)
+#define FOCUS_HID_LGUI (1u << 3)
+#define FOCUS_HID_RCTL (1u << 4)
+#define FOCUS_HID_RSFT (1u << 5)
+#define FOCUS_HID_RALT (1u << 6)
+#define FOCUS_HID_RGUI (1u << 7)
+
 struct focus_status_state {
     /* NULL or empty when the layer has no display-name in the keymap. */
     const char *layer_name;
     uint8_t layer_index;
     bool layer_uppercase;
+
+    /* HID modifier flags, as ZMK reports the explicit mods. */
+    uint8_t mods;
 
     bool usb;
     uint8_t profile_index; /* 0-based, as ZMK reports it */
@@ -61,6 +90,11 @@ struct focus_status_state {
 struct focus_status_view {
     char layer[FOCUS_LAYER_TEXT_MAX];
     enum focus_role layer_role;
+
+    /* One role per glyph, GACS order, indexed by enum focus_mod. The glyphs
+     * themselves are the widget's business — they are typography, and they
+     * never change. What changes is which of them is lit. */
+    enum focus_role mods[FOCUS_MOD_COUNT];
 
     /* The circled digit is UTF-8, so this is bytes too: three for a glyph,
      * four for "B 12", and room to spare. */

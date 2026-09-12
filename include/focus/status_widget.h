@@ -8,8 +8,8 @@
  *
  * Derived from carrefinho/prospector-zmk-module (MIT) — see NOTICE.
  * Changed: the logic this file used to carry now lives in the view model, the
- * colours arrive as roles rather than as values, and the modifier row is not
- * here yet — it needs glyphs no OFL face carries alone (rung 3.4c).
+ * colours arrive as roles rather than as values, and the modifier glyphs come
+ * from one OFL face rather than from Apple's private-use codepoints.
  */
 
 #pragma once
@@ -23,6 +23,7 @@ struct focus_widget_status {
     sys_snode_t node;
     lv_obj_t *obj;
     lv_obj_t *layer_label;
+    lv_obj_t *mods[FOCUS_MOD_COUNT];
     lv_obj_t *profile_label;
     lv_obj_t *battery[FOCUS_BATTERY_MAX];
 };

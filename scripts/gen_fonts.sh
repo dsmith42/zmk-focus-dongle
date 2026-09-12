@@ -29,6 +29,9 @@ DINISH="https://raw.githubusercontent.com/playbeing/dinish/master/fonts/ttf/DINi
 # Noto Sans Symbols: SIL Open Font License 1.1. https://github.com/notofonts/symbols
 NOTO_SYMBOLS="https://raw.githubusercontent.com/notofonts/notofonts.github.io/main/fonts/NotoSansSymbols/hinted/ttf/NotoSansSymbols-Regular.ttf"
 
+# JuliaMono: SIL Open Font License 1.1. https://github.com/cormullion/juliamono
+JULIAMONO="https://raw.githubusercontent.com/cormullion/juliamono/master/JuliaMono-Regular.ttf"
+
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 out_dir="$repo_root/src/fonts"
 work="$(mktemp -d)"
@@ -114,6 +117,20 @@ generate "DINish_Medium_24" "$DINISH" 24 "0123456789" "battery numerals"
 # weight under the battery numerals despite the larger box.
 generate "NotoSymbols_Regular_28" "$NOTO_SYMBOLS" 28 "①②③④⑤" "profile circled digits"
 
+# The held modifiers, in GACS order. Four glyphs from ONE face, which was the
+# open question of this rung: the spec's plan was to merge Noto Sans Symbols 1
+# and 2, because ⌃ lives in the first and ⌘⌥⇧ in the second. Measured coverage
+# says JuliaMono carries all four, and it is OFL.
+#
+# That matters for more than tidiness. lv_font_conv's --size is global per
+# conversion, so a two-family merge cannot correct for the fact that Noto's ⌃ is
+# 9.0px wide against its ⌥ at 17.3px -- nearly half, because they are different
+# faces. JuliaMono is monospaced, so its four sit in 10.4..11.6px by
+# construction. One face, no fallback chain, no size-per-source trick.
+#
+# 28px puts ⌘ at 14.6px of ink against the layer label's 14.2px cap height, so
+# the two ends of the bottom row read as one line rather than two sizes.
+generate "JuliaMono_Regular_28" "$JULIAMONO" 28 "⌘⌥⌃⇧" "modifier glyphs"
+
 echo
-echo "Fonts are OFL. src/fonts/DINish-OFL.txt and src/fonts/NotoSansSymbols-OFL.txt"
-echo "travel with them; see NOTICE."
+echo "Fonts are OFL. Their licence texts travel with them in src/fonts/; see NOTICE."
