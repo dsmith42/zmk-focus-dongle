@@ -127,6 +127,48 @@ static void test_profile_past_the_glyphs_falls_back_to_text(void) {
     CHECK_EQ(v.profile_form, FOCUS_PROFILE_TEXT);
 }
 
+/* --- modifiers ----------------------------------------------------------- */
+
+static struct focus_status_view mods_view(const char *name, uint8_t mods) {
+    current = name;
+    struct focus_status_state s = {.mods = mods};
+    return focus_status_view_of(&s);
+}
+
+static void test_nothing_held_still_draws_four_glyphs(void) {
+    struct focus_status_view v = mods_view("nothing held is idle, not absent", 0);
+    for (int i = 0; i < FOCUS_MOD_COUNT; i++) {
+        CHECK_EQ(v.mods[i], FOCUS_ROLE_IDLE);
+    }
+}
+
+/* The order is the whole point of the row: a chord is read left to right as
+ * ⌘⌥⌃⇧, so GUI must be index 0 and SHIFT index 3. Getting this wrong produces
+ * a screen that is subtly, permanently lying. */
+static void test_the_order_is_gacs(void) {
+    struct focus_status_view v = mods_view("GACS order", FOCUS_HID_LGUI);
+    CHECK_EQ(v.mods[FOCUS_MOD_GUI], FOCUS_ROLE_ACCENT);
+    CHECK_EQ(v.mods[FOCUS_MOD_ALT], FOCUS_ROLE_IDLE);
+    CHECK_EQ(v.mods[FOCUS_MOD_CTRL], FOCUS_ROLE_IDLE);
+    CHECK_EQ(v.mods[FOCUS_MOD_SHIFT], FOCUS_ROLE_IDLE);
+}
+
+static void test_left_and_right_collapse_to_one_glyph(void) {
+    struct focus_status_view l = mods_view("left shift lights shift", FOCUS_HID_LSFT);
+    struct focus_status_view r = mods_view("right shift lights the same glyph", FOCUS_HID_RSFT);
+    CHECK_EQ(l.mods[FOCUS_MOD_SHIFT], FOCUS_ROLE_ACCENT);
+    CHECK_EQ(r.mods[FOCUS_MOD_SHIFT], FOCUS_ROLE_ACCENT);
+}
+
+static void test_a_full_chord_lights_everything(void) {
+    struct focus_status_view v =
+        mods_view("all four, mixed hands",
+                  FOCUS_HID_RGUI | FOCUS_HID_LALT | FOCUS_HID_RCTL | FOCUS_HID_LSFT);
+    for (int i = 0; i < FOCUS_MOD_COUNT; i++) {
+        CHECK_EQ(v.mods[i], FOCUS_ROLE_ACCENT);
+    }
+}
+
 /* --- battery ------------------------------------------------------------- */
 
 static void test_battery_levels_are_plain_numbers(void) {
@@ -163,6 +205,11 @@ int main(void) {
     test_last_circled_profile();
     test_usb_wins_over_the_profile();
     test_profile_past_the_glyphs_falls_back_to_text();
+
+    test_nothing_held_still_draws_four_glyphs();
+    test_the_order_is_gacs();
+    test_left_and_right_collapse_to_one_glyph();
+    test_a_full_chord_lights_everything();
 
     test_battery_levels_are_plain_numbers();
     test_the_low_threshold_is_exclusive();

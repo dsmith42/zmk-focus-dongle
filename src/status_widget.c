@@ -18,10 +18,12 @@
 #include <zmk/ble.h>
 #include <zmk/display.h>
 #include <zmk/endpoints.h>
+#include <zmk/hid.h>
 #include <zmk/event_manager.h>
 #include <zmk/events/battery_state_changed.h>
 #include <zmk/events/ble_active_profile_changed.h>
 #include <zmk/events/endpoint_changed.h>
+#include <zmk/events/keycode_state_changed.h>
 #include <zmk/events/layer_state_changed.h>
 #include <zmk/keymap.h>
 
@@ -65,15 +67,37 @@
  * name outright.
  *
  * 10px is only enough where the content is far from a corner, which is true of
- * the whole right column and false here — the label's lowest ink sits ~6px off
+ * the whole right column and false here — the row's lowest ink sits ~6px off
  * the bottom edge, and that is where the arc bites hardest. For a corner radius
  * anywhere in 20..30px the encroachment at that height is 6..10px, so doubling
  * the inset clears it with margin rather than by exactly one character.
  *
- * ⚠️ The modifier row lands on this same baseline at 3.4c and needs the mirror
- * of this, not STATUS_INSET.
+ * It applies at BOTH ends: the layer name on the left and the modifier row on
+ * the right sit on the same baseline, so they meet the same two corners.
  */
 #define STATUS_CORNER_INSET 20
+
+/*
+ * The modifier row, bottom right. Glyphs rather than CMD/OPT/CTL/SFT: a symbol
+ * is recognised without being read, which is what the rest of this screen is
+ * built around.
+ *
+ * Pitch is derived from the baked advance (16.8px at 28) plus air, not from the
+ * old tree's 32 — that number belonged to a different face at a different size.
+ *
+ * ⚠️ ⌃ IS DRAWN HIGH BY ITS FACE. Measured ink above the baseline, at 28px:
+ *
+ *     ⌘  0..15   centre  7.5      ⌃  8..18   centre 13.0
+ *     ⌥  3..12   centre  7.5      ⇧  0..16   centre  8.0
+ *
+ * Three of the four agree within half a pixel; U+2303 is an UP ARROWHEAD, drawn
+ * at cap height like a caret rather than centred like a key symbol. Left alone
+ * it floats five pixels above its neighbours. One glyph therefore carries one
+ * measured offset, rather than the row being nudged by eye.
+ */
+#define STATUS_MODS_PITCH 26
+#define STATUS_MODS_Y -8
+#define STATUS_MODS_CARET_DROP 5
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
@@ -95,6 +119,12 @@ static bool same_view(const struct focus_status_view *a, const struct focus_stat
         return false;
     }
 
+    for (int i = 0; i < FOCUS_MOD_COUNT; i++) {
+        if (a->mods[i] != b->mods[i]) {
+            return false;
+        }
+    }
+
     for (uint8_t i = 0; i < a->battery_count; i++) {
         if (strcmp(a->battery[i].text, b->battery[i].text) != 0 ||
             a->battery[i].role != b->battery[i].role) {
@@ -114,6 +144,13 @@ static void render(const struct focus_status_view *v) {
         if (!have_prev || v->layer_role != prev.layer_role) {
             lv_obj_set_style_text_color(widget->layer_label,
                                         lv_color_hex(focus_hex_of(v->layer_role)), LV_PART_MAIN);
+        }
+
+        for (int i = 0; i < FOCUS_MOD_COUNT; i++) {
+            if (!have_prev || v->mods[i] != prev.mods[i]) {
+                lv_obj_set_style_text_color(widget->mods[i],
+                                            lv_color_hex(focus_hex_of(v->mods[i])), LV_PART_MAIN);
+            }
         }
 
         /* The typeface is part of the profile's form: a circled digit comes from
@@ -154,6 +191,7 @@ static void refresh(void) {
         .layer_name = zmk_keymap_layer_name(zmk_keymap_layer_index_to_id(index)),
         .layer_index = index,
         .layer_uppercase = IS_ENABLED(CONFIG_FOCUS_DONGLE_LAYER_NAME_UPPERCASE),
+        .mods = zmk_hid_get_explicit_mods(),
         .usb = (selected.transport == ZMK_TRANSPORT_USB),
         .profile_index = zmk_ble_active_profile_index(),
         .battery_count = STATUS_BATTERY_COUNT,
@@ -170,11 +208,12 @@ static void refresh(void) {
     }
 }
 
-/* Layer, profile and endpoint are all queryable at any time, so one listener
- * covers the three events: each of them only says "something moved". */
+/* Layer, profile, endpoint and held modifiers are all queryable at any time, so
+ * one listener covers their events: each of them only says "something moved". */
 struct status_state {
     uint8_t layer;
     uint8_t profile;
+    uint8_t mods;
     bool usb;
 };
 
@@ -186,6 +225,7 @@ static struct status_state status_get_state(const zmk_event_t *eh) {
     return (struct status_state){
         .layer = zmk_keymap_highest_layer_active(),
         .profile = zmk_ble_active_profile_index(),
+        .mods = zmk_hid_get_explicit_mods(),
         .usb = (selected.transport == ZMK_TRANSPORT_USB),
     };
 }
@@ -220,6 +260,7 @@ ZMK_DISPLAY_WIDGET_LISTENER(widget_status, struct status_state, status_update_cb
 ZMK_SUBSCRIPTION(widget_status, zmk_layer_state_changed);
 ZMK_SUBSCRIPTION(widget_status, zmk_ble_active_profile_changed);
 ZMK_SUBSCRIPTION(widget_status, zmk_endpoint_changed);
+ZMK_SUBSCRIPTION(widget_status, zmk_keycode_state_changed);
 
 ZMK_DISPLAY_WIDGET_LISTENER(widget_status_battery, struct battery_event_state, battery_update_cb,
                             battery_get_state)
@@ -258,11 +299,25 @@ int focus_widget_status_init(struct focus_widget_status *widget, lv_obj_t *paren
                                         LV_ALIGN_TOP_RIGHT, x, STATUS_BATTERY_Y);
     }
 
-    /* Layer bottom left. The bottom right is deliberately empty until the
-     * modifier row lands — the two belong on one baseline, so a chord and the
-     * layer it is on are read in a single movement. */
+    /* Layer bottom left, modifiers bottom right, on one baseline — a chord and
+     * the layer it is on are read in a single movement. */
     widget->layer_label = make_label(widget->obj, &DINish_Medium_20, FOCUS_ROLE_ACCENT, "",
                                      LV_ALIGN_BOTTOM_LEFT, STATUS_CORNER_INSET, -6);
+
+    static const char *const mod_glyphs[FOCUS_MOD_COUNT] = {
+        [FOCUS_MOD_GUI] = "⌘",
+        [FOCUS_MOD_ALT] = "⌥",
+        [FOCUS_MOD_CTRL] = "⌃",
+        [FOCUS_MOD_SHIFT] = "⇧",
+    };
+
+    for (int i = 0; i < FOCUS_MOD_COUNT; i++) {
+        int x = -STATUS_CORNER_INSET - (FOCUS_MOD_COUNT - 1 - i) * STATUS_MODS_PITCH;
+        int y = STATUS_MODS_Y + (i == FOCUS_MOD_CTRL ? STATUS_MODS_CARET_DROP : 0);
+
+        widget->mods[i] = make_label(widget->obj, &JuliaMono_Regular_28, FOCUS_ROLE_IDLE,
+                                     mod_glyphs[i], LV_ALIGN_BOTTOM_RIGHT, x, y);
+    }
 
     sys_slist_append(&widgets, &widget->node);
     widget_status_init();

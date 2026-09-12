@@ -22,7 +22,8 @@ enum focus_role {
     FOCUS_ROLE_THEME,  /* carries the block colour, at full strength */
     FOCUS_ROLE_DIM,    /* armed but not started */
     FOCUS_ROLE_GREY,   /* a resting readout: consulted, never watched */
-    FOCUS_ROLE_ACCENT, /* keyboard state — which layer is live */
+    FOCUS_ROLE_ACCENT, /* keyboard state, live — the layer, a held modifier */
+    FOCUS_ROLE_IDLE,   /* ...and the same thing not live. Present, not absent. */
     FOCUS_ROLE_OK,     /* a health readout inside its normal range */
     FOCUS_ROLE_LOW,    /* ...and outside it. The only alarm colour here. */
 };

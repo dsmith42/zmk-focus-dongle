@@ -52,11 +52,30 @@ static void profile_text(const struct focus_status_state *state, struct focus_st
     snprintf(v->profile, sizeof(v->profile), "B %u", state->profile_index + 1);
 }
 
+/* GACS, matching the order the glyphs are drawn in and the order a Mac chord is
+ * conventionally written. Each entry is the pair of HID bits that lights it:
+ * left and right collapse, because the question is whether the modifier is
+ * held, not which hand held it. */
+static void mod_roles(uint8_t mods, enum focus_role *out) {
+    static const uint8_t bits[FOCUS_MOD_COUNT] = {
+        [FOCUS_MOD_GUI] = FOCUS_HID_LGUI | FOCUS_HID_RGUI,
+        [FOCUS_MOD_ALT] = FOCUS_HID_LALT | FOCUS_HID_RALT,
+        [FOCUS_MOD_CTRL] = FOCUS_HID_LCTL | FOCUS_HID_RCTL,
+        [FOCUS_MOD_SHIFT] = FOCUS_HID_LSFT | FOCUS_HID_RSFT,
+    };
+
+    for (int i = 0; i < FOCUS_MOD_COUNT; i++) {
+        out[i] = (mods & bits[i]) ? FOCUS_ROLE_ACCENT : FOCUS_ROLE_IDLE;
+    }
+}
+
 struct focus_status_view focus_status_view_of(const struct focus_status_state *state) {
     struct focus_status_view v = {0};
 
     layer_text(state, v.layer, sizeof(v.layer));
     v.layer_role = FOCUS_ROLE_ACCENT;
+
+    mod_roles(state->mods, v.mods);
 
     profile_text(state, &v);
     v.profile_role = FOCUS_ROLE_GREY;
