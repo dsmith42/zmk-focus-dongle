@@ -60,6 +60,21 @@
 #define STATUS_BATTERY_PITCH 36
 #define STATUS_INSET 10
 
+/* The bottom row needs MORE than the standard inset, found on hardware
+ * 12 Sep 2026: at 10px the corner arc ate the first character of the layer
+ * name outright.
+ *
+ * 10px is only enough where the content is far from a corner, which is true of
+ * the whole right column and false here — the label's lowest ink sits ~6px off
+ * the bottom edge, and that is where the arc bites hardest. For a corner radius
+ * anywhere in 20..30px the encroachment at that height is 6..10px, so doubling
+ * the inset clears it with margin rather than by exactly one character.
+ *
+ * ⚠️ The modifier row lands on this same baseline at 3.4c and needs the mirror
+ * of this, not STATUS_INSET.
+ */
+#define STATUS_CORNER_INSET 20
+
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
 /* Peripheral battery levels arrive one event at a time and cannot be queried
@@ -247,7 +262,7 @@ int focus_widget_status_init(struct focus_widget_status *widget, lv_obj_t *paren
      * modifier row lands — the two belong on one baseline, so a chord and the
      * layer it is on are read in a single movement. */
     widget->layer_label = make_label(widget->obj, &DINish_Medium_20, FOCUS_ROLE_ACCENT, "",
-                                     LV_ALIGN_BOTTOM_LEFT, STATUS_INSET, -6);
+                                     LV_ALIGN_BOTTOM_LEFT, STATUS_CORNER_INSET, -6);
 
     sys_slist_append(&widgets, &widget->node);
     widget_status_init();
