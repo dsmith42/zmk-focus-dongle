@@ -12,9 +12,8 @@
 # commercial and could not be redistributed. Collapsing onto DINish is what makes
 # the module shareable, and it is a better-looking screen for being consistent.
 #
-# The one non-Latin face is Noto Sans Symbols, which carries the circled digits
-# the BLE profile is drawn with. Also OFL, and also baked down to the five
-# glyphs used.
+# The one non-Latin face is JuliaMono, which carries all four modifier glyphs.
+# Also OFL, and also baked down to the glyphs used.
 #
 # Requires node (for npx) and network. The TTFs are downloaded rather than
 # vendored, both to keep the repo small and to make the OFL provenance obvious.
@@ -25,9 +24,6 @@ BPP=4
 
 # DINish: SIL Open Font License 1.1. https://github.com/playbeing/dinish
 DINISH="https://raw.githubusercontent.com/playbeing/dinish/master/fonts/ttf/DINish/DINish-Medium.ttf"
-
-# Noto Sans Symbols: SIL Open Font License 1.1. https://github.com/notofonts/symbols
-NOTO_SYMBOLS="https://raw.githubusercontent.com/notofonts/notofonts.github.io/main/fonts/NotoSansSymbols/hinted/ttf/NotoSansSymbols-Regular.ttf"
 
 # JuliaMono: SIL Open Font License 1.1. https://github.com/cormullion/juliamono
 JULIAMONO="https://raw.githubusercontent.com/cormullion/juliamono/master/JuliaMono-Regular.ttf"
@@ -98,24 +94,12 @@ generate "DINish_Medium_32" "$DINISH" 32 "0123456789" "dial numeral"
 # Costs ~4 KB against ~380 KB of free flash.
 generate "DINish_Medium_20" "$DINISH" 20 "0x20-0x7E" "layer label"
 
-# Battery percentages. Digits only -- the numerals sit side by side with position
-# carrying which half is which, so there is no "L"/"R" and no percent sign.
-generate "DINish_Medium_24" "$DINISH" 24 "0123456789" "battery numerals"
-
-# The BLE profile, as a circled digit rather than the old "B 1". Five, because
-# that is ZMK's usual profile count; a sixth profile falls back to text rather
-# than growing this set, since past five the number is the thing being read and
-# the ring has stopped earning its pixels.
+# Battery percentages and the BLE profile. Digits, plus the three letters of
+# "USB" -- the profile is a plain number and needs a word only when wired.
 #
-# Outline (U+2460), not the filled U+2776 also present in this face: filled reads
-# as an alert badge next to the battery numerals, which is the wrong weight for
-# something consulted rather than watched.
-#
-# 28px because the payload is the digit INSIDE the ring, and the ring is ~82% of
-# the em against DINish's 71% cap height -- at 20px the inner digit is under 8px
-# and 3/5/6 blur into each other at a glance. The thin stroke keeps its visual
-# weight under the battery numerals despite the larger box.
-generate "NotoSymbols_Regular_28" "$NOTO_SYMBOLS" 28 "①②③④⑤" "profile circled digits"
+# The batteries sit side by side with position carrying which half is which, so
+# there is no "L"/"R" and no percent sign.
+generate "DINish_Medium_24" "$DINISH" 24 "0123456789USB" "battery and profile numerals"
 
 # The held modifiers, in GACS order. Four glyphs from ONE face, which was the
 # open question of this rung: the spec's plan was to merge Noto Sans Symbols 1

@@ -28,28 +28,16 @@ static void layer_text(const struct focus_status_state *state, char *out, size_t
 }
 
 static void profile_text(const struct focus_status_state *state, struct focus_status_view *v) {
-    static const char *const circled[FOCUS_PROFILE_CIRCLED_MAX] = {"①", "②", "③", "④", "⑤"};
-
     /* USB wins over the profile index. Plugged in is plugged in, whichever
      * profile happens to be selected underneath. */
     if (state->usb) {
-        v->profile_form = FOCUS_PROFILE_TEXT;
         snprintf(v->profile, sizeof(v->profile), "USB");
         return;
     }
 
-    if (state->profile_index < FOCUS_PROFILE_CIRCLED_MAX) {
-        v->profile_form = FOCUS_PROFILE_CIRCLED;
-        snprintf(v->profile, sizeof(v->profile), "%s", circled[state->profile_index]);
-        return;
-    }
-
-    /* More BLE profiles than there are circled digits — possible, because ZMK
-     * derives the count from CONFIG_BT_MAX_PAIRED. Fall back to the old spaced
-     * form rather than baking twenty glyphs for a case nobody configures.
-     * Spaced because "B6" reads cramped at this size. */
-    v->profile_form = FOCUS_PROFILE_TEXT;
-    snprintf(v->profile, sizeof(v->profile), "B %u", state->profile_index + 1);
+    /* 0-based inside ZMK, 1-based on screen, matching what a keymap binds with
+     * &bt BT_SEL 0 and what the host shows. */
+    snprintf(v->profile, sizeof(v->profile), "%u", state->profile_index + 1);
 }
 
 /* GACS, matching the order the glyphs are drawn in and the order a Mac chord is

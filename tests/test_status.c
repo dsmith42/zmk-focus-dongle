@@ -99,32 +99,23 @@ static void test_a_long_name_is_truncated_not_overrun(void) {
 
 /* --- profile ------------------------------------------------------------- */
 
-static void test_profile_is_a_circled_digit_one_based(void) {
-    struct focus_status_view v = profile_view("profile 0 draws as ①", false, 0);
-    CHECK_STR(v.profile, "①");
-    CHECK_EQ(v.profile_form, FOCUS_PROFILE_CIRCLED);
+static void test_profile_is_the_number_one_based(void) {
+    struct focus_status_view v = profile_view("profile 0 shows as 1", false, 0);
+    CHECK_STR(v.profile, "1");
     CHECK_EQ(v.profile_role, FOCUS_ROLE_GREY);
-}
-
-static void test_last_circled_profile(void) {
-    struct focus_status_view v = profile_view("profile 4 draws as ⑤", false, 4);
-    CHECK_STR(v.profile, "⑤");
-    CHECK_EQ(v.profile_form, FOCUS_PROFILE_CIRCLED);
 }
 
 static void test_usb_wins_over_the_profile(void) {
     struct focus_status_view v = profile_view("USB beats a selected profile", true, 2);
     CHECK_STR(v.profile, "USB");
-    CHECK_EQ(v.profile_form, FOCUS_PROFILE_TEXT);
 }
 
-/* ZMK derives its profile count from CONFIG_BT_MAX_PAIRED, so a config with
- * more profiles than there are baked glyphs is legal. It must degrade to text
- * rather than to a box. */
-static void test_profile_past_the_glyphs_falls_back_to_text(void) {
-    struct focus_status_view v = profile_view("a sixth profile falls back to text", false, 5);
-    CHECK_STR(v.profile, "B 6");
-    CHECK_EQ(v.profile_form, FOCUS_PROFILE_TEXT);
+/* ZMK derives its profile count from CONFIG_BT_MAX_PAIRED, so there is no fixed
+ * ceiling to honour here -- which is the point of drawing the number plainly
+ * rather than as one of a baked set of glyphs. */
+static void test_a_high_profile_is_just_a_number(void) {
+    struct focus_status_view v = profile_view("a ninth profile needs no special case", false, 8);
+    CHECK_STR(v.profile, "9");
 }
 
 /* --- modifiers ----------------------------------------------------------- */
@@ -201,10 +192,9 @@ int main(void) {
     test_uppercase_leaves_utf8_alone();
     test_a_long_name_is_truncated_not_overrun();
 
-    test_profile_is_a_circled_digit_one_based();
-    test_last_circled_profile();
+    test_profile_is_the_number_one_based();
     test_usb_wins_over_the_profile();
-    test_profile_past_the_glyphs_falls_back_to_text();
+    test_a_high_profile_is_just_a_number();
 
     test_nothing_held_still_draws_four_glyphs();
     test_the_order_is_gacs();
