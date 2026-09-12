@@ -14,7 +14,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 static int on_keymap_binding_pressed(struct zmk_behavior_binding *binding,
                                      struct zmk_behavior_binding_event event) {
-    focus_themer_arm((uint16_t)binding->param1);
+    focus_timer_set_theme((uint8_t)binding->param1);
     return ZMK_BEHAVIOR_OPAQUE;
 }
 
