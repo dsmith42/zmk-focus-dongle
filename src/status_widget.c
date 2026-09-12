@@ -139,14 +139,16 @@ static void render(const struct focus_status_view *v) {
             lv_label_set_text(widget->layer_label, v->layer);
         }
         if (!have_prev || v->layer_role != prev.layer_role) {
-            lv_obj_set_style_text_color(widget->layer_label,
-                                        lv_color_hex(focus_hex_of(v->layer_role)), LV_PART_MAIN);
+            lv_obj_set_style_text_color(
+                widget->layer_label, lv_color_hex(focus_hex_of(v->layer_role, FOCUS_THEME_ANY)),
+                LV_PART_MAIN);
         }
 
         for (int i = 0; i < FOCUS_MOD_COUNT; i++) {
             if (!have_prev || v->mods[i] != prev.mods[i]) {
-                lv_obj_set_style_text_color(widget->mods[i],
-                                            lv_color_hex(focus_hex_of(v->mods[i])), LV_PART_MAIN);
+                lv_obj_set_style_text_color(
+                    widget->mods[i], lv_color_hex(focus_hex_of(v->mods[i], FOCUS_THEME_ANY)),
+                    LV_PART_MAIN);
             }
         }
 
@@ -154,8 +156,9 @@ static void render(const struct focus_status_view *v) {
             lv_label_set_text(widget->profile_label, v->profile);
         }
         if (!have_prev || v->profile_role != prev.profile_role) {
-            lv_obj_set_style_text_color(widget->profile_label,
-                                        lv_color_hex(focus_hex_of(v->profile_role)), LV_PART_MAIN);
+            lv_obj_set_style_text_color(
+                widget->profile_label, lv_color_hex(focus_hex_of(v->profile_role, FOCUS_THEME_ANY)),
+                LV_PART_MAIN);
         }
 
         for (uint8_t i = 0; i < v->battery_count; i++) {
@@ -163,9 +166,9 @@ static void render(const struct focus_status_view *v) {
                 lv_label_set_text(widget->battery[i], v->battery[i].text);
             }
             if (!have_prev || v->battery[i].role != prev.battery[i].role) {
-                lv_obj_set_style_text_color(widget->battery[i],
-                                            lv_color_hex(focus_hex_of(v->battery[i].role)),
-                                            LV_PART_MAIN);
+                lv_obj_set_style_text_color(
+                    widget->battery[i],
+                    lv_color_hex(focus_hex_of(v->battery[i].role, FOCUS_THEME_ANY)), LV_PART_MAIN);
             }
         }
     }
@@ -263,7 +266,8 @@ static lv_obj_t *make_label(lv_obj_t *parent, const lv_font_t *font, enum focus_
 
     lv_label_set_text(label, text);
     lv_obj_set_style_text_font(label, font, LV_PART_MAIN);
-    lv_obj_set_style_text_color(label, lv_color_hex(focus_hex_of(role)), LV_PART_MAIN);
+    lv_obj_set_style_text_color(label, lv_color_hex(focus_hex_of(role, FOCUS_THEME_ANY)),
+                                LV_PART_MAIN);
     lv_obj_align(label, align, x, y);
 
     return label;

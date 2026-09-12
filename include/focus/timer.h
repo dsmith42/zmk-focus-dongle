@@ -28,6 +28,14 @@ struct focus_timer_state {
     int64_t remaining_ms;
     int64_t total_ms;
     uint16_t armed_minutes; /* what a start would begin */
+
+    /* Which palette the dial draws this block in — model data, not a colour.
+     * The mapping to a hex value happens at the widget, so the view model and
+     * its tests never see one.
+     *
+     * Survives a block, like armed_minutes: the theme is part of what a block
+     * WAS, and stopping is when a block gets read. */
+    uint8_t theme;
 };
 
 /* Select the length a later start will use. Ignored while a block is live,
@@ -45,6 +53,13 @@ void focus_timer_start(uint16_t minutes);
 /* Stop and clear. Also the act that ends an overrunning block, which is when
  * its overrun is read. */
 void focus_timer_stop(void);
+
+/* Choose the palette. Unlike arm and start, this is allowed WHILE A BLOCK IS
+ * RUNNING, and that asymmetry is deliberate: length and elapsed time are the
+ * data a stray keypress must not be able to destroy, whereas the theme destroys
+ * nothing. Realising twenty minutes in that this block is something else is a
+ * real thing that happens, and the correction should be one key. */
+void focus_timer_set_theme(uint8_t theme);
 
 /* Current state, recomputed from uptime at call time. */
 void focus_timer_get(struct focus_timer_state *out);

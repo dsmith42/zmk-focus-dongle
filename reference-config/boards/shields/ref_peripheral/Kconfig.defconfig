@@ -1,0 +1,21 @@
+# A split PERIPHERAL, which is a separate shield rather than the dongle with an
+# override, so that the dongle's shield can carry dongle-only devicetree -- the
+# chosen theme -- without the peripheral build ever seeing it. That is the bug
+# class this repo has hit twice: a node visible only to the display build,
+# referenced from somewhere every build compiles.
+
+if SHIELD_REF_PERIPHERAL
+
+config ZMK_KEYBOARD_NAME
+    default "Reference"
+
+config ZMK_KSCAN_MOCK_DRIVER
+    default y
+
+config ZMK_SPLIT
+    default y
+
+config ZMK_SPLIT_ROLE_CENTRAL
+    default n
+
+endif

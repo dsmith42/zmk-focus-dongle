@@ -51,6 +51,7 @@ static void emit(const char *label, bool running, int64_t remaining, int64_t tot
 
     printf("%s\n", label);
     printf("  numeral      %-4d %s\n", v.numeral, role(v.numeral_role));
+    printf("  theme        %d\n", v.theme);
     printf("  hand_deg     %d\n", v.hand_deg);
     printf("  track_deg    %d\n", v.track_deg);
     printf("  wedge_deg    %-4d %s\n", v.wedge_deg, role(v.wedge_role));
@@ -62,11 +63,30 @@ static void emit(const char *label, bool running, int64_t remaining, int64_t tot
     printf("\n");
 }
 
+/* One state with a palette selected, to pin that the view model passes the
+ * index through and resolves nothing. A red build and a teal build print the
+ * same line — the colour is the widget's business. */
+static void emit_themed(const char *label, int64_t remaining, int64_t total, uint8_t theme) {
+    struct focus_timer_state s = {.running = true,
+                                  .remaining_ms = remaining,
+                                  .total_ms = total,
+                                  .armed_minutes = 45,
+                                  .theme = theme};
+    struct focus_dial_view v = focus_dial_view_of(&s);
+
+    printf("%s\n", label);
+    printf("  numeral      %-4d %s\n", v.numeral, role(v.numeral_role));
+    printf("  theme        %d\n", v.theme);
+    printf("  wedge_deg    %-4d %s\n", v.wedge_deg, role(v.wedge_role));
+    printf("\n");
+}
+
 int main(void) {
     emit("armed 45, not started", false, 0, 0, 45);
     emit("armed 90, not started", false, 0, 0, 90);
     emit("running 45 of 45", true, MIN(45), MIN(45), 45);
     emit("running 21 of 45", true, MIN(21), MIN(45), 45);
+    emit("running 42 of 60", true, MIN(42), MIN(60), 45);
     emit("running 1 of 45", true, MIN(1), MIN(45), 45);
     emit("running 75 of 90", true, MIN(75), MIN(90), 90);
     emit("running 45 of 90", true, MIN(45), MIN(90), 90);
@@ -75,5 +95,6 @@ int main(void) {
     emit("one minute over a 45", true, -MIN(1), MIN(45), 45);
     emit("overrun 15 past a 45", true, -MIN(15), MIN(45), 45);
     emit("overrun 60 past a 30, hand wraps", true, -MIN(60), MIN(30), 45);
+    emit_themed("running 21 of 45, palette 4", MIN(21), MIN(45), 4);
     return 0;
 }

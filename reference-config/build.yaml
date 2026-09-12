@@ -10,7 +10,7 @@ include:
     shield: ref_dongle focus_dongle
     artifact-name: ref-dongle
 
-  # A split peripheral: same keymap, no display shield, not central.
+  # A split peripheral: same keymap, its own shield, no display shield.
   #
   # This target exists to catch one specific class of bug, which this project
   # has hit twice. A peripheral compiles the same keymap as the dongle, so it
@@ -21,6 +21,5 @@ include:
   # A different board on purpose: it also proves the module is not quietly
   # assuming the dongle's SoC.
   - board: nice_nano//zmk
-    shield: ref_dongle
-    cmake-args: -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=n
+    shield: ref_peripheral
     artifact-name: ref-peripheral

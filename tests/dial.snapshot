@@ -1,5 +1,6 @@
 armed 45, not started
   numeral      45   dim
+  theme        0
   hand_deg     270
   track_deg    270
   wedge_deg    270  dim
@@ -7,6 +8,7 @@ armed 45, not started
 
 armed 90, not started
   numeral      90   dim
+  theme        0
   hand_deg     180
   track_deg    360
   wedge_deg    360  dim
@@ -14,6 +16,7 @@ armed 90, not started
 
 running 45 of 45
   numeral      45   grey
+  theme        0
   hand_deg     270
   track_deg    270
   wedge_deg    270  theme
@@ -21,13 +24,23 @@ running 45 of 45
 
 running 21 of 45
   numeral      21   grey
+  theme        0
   hand_deg     126
   track_deg    270
   wedge_deg    126  theme
   ring         hidden
 
+running 42 of 60
+  numeral      42   grey
+  theme        0
+  hand_deg     252
+  track_deg    360
+  wedge_deg    252  theme
+  ring         hidden
+
 running 1 of 45
   numeral      1    grey
+  theme        0
   hand_deg     6
   track_deg    270
   wedge_deg    6    theme
@@ -35,6 +48,7 @@ running 1 of 45
 
 running 75 of 90
   numeral      75   grey
+  theme        0
   hand_deg     90
   track_deg    360
   wedge_deg    360  theme
@@ -42,6 +56,7 @@ running 75 of 90
 
 running 45 of 90
   numeral      45   grey
+  theme        0
   hand_deg     270
   track_deg    360
   wedge_deg    270  theme
@@ -49,6 +64,7 @@ running 45 of 90
 
 exactly zero of 45
   numeral      0    theme
+  theme        0
   hand_deg     0
   track_deg    270
   wedge_deg    0    theme
@@ -56,6 +72,7 @@ exactly zero of 45
 
 59 seconds over a 45
   numeral      0    theme
+  theme        0
   hand_deg     0
   track_deg    270
   wedge_deg    0    theme
@@ -63,6 +80,7 @@ exactly zero of 45
 
 one minute over a 45
   numeral      46   theme
+  theme        0
   hand_deg     354
   track_deg    270
   wedge_deg    0    theme
@@ -70,6 +88,7 @@ one minute over a 45
 
 overrun 15 past a 45
   numeral      60   theme
+  theme        0
   hand_deg     270
   track_deg    270
   wedge_deg    0    theme
@@ -77,8 +96,14 @@ overrun 15 past a 45
 
 overrun 60 past a 30, hand wraps
   numeral      90   theme
+  theme        0
   hand_deg     0
   track_deg    180
   wedge_deg    0    theme
   ring         hidden
+
+running 21 of 45, palette 4
+  numeral      21   grey
+  theme        4
+  wedge_deg    126  theme
 
