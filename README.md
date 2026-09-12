@@ -11,7 +11,7 @@ profile and peripheral battery around it.
 This exists because **[carrefinho](https://github.com/carrefinho)** designed the
 Prospector dongle and popularised it. If you want one,
 [buy the kit from beekeeb](https://shop.beekeeb.com/products/zmk-wireless-dongle-prospector-diy-kit)
-— that is where this started.
+— that is where this build / addition started.
 
 - **Hardware** — [carrefinho/prospector](https://github.com/carrefinho/prospector),
   CERN-OHL-P-2.0
@@ -24,7 +24,7 @@ Prospector dongle and popularised it. If you want one,
   cannot rotate this panel. See [`NOTICE`](NOTICE).
 
 Everything above the hardware layer — the dial, the block timer, the behaviours, the
-theming and the font pipeline — is new work in this repository.
+theming and the font pipeline — is new work.
 
 ## Why a separate module
 
