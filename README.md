@@ -4,7 +4,21 @@ A ZMK module for the [Prospector](https://github.com/carrefinho/prospector) desk
 dongle: a focus-block timer drawn as an analogue dial, with layer, modifiers, output
 profile and peripheral battery around it.
 
-> **Status: early.** Being rebuilt from the ground up. Not ready to use yet.
+## ⚠️ Status: work in progress — use at your own risk
+
+Public because it works on my desk and someone else might want it, not because it is
+finished.
+
+- **`main` moves.** No releases, no deprecations — **pin a SHA** in your `west.yml`.
+- **Largely vibe coded.** Written by an LLM to my design decisions, reviewed rather
+  than hand-audited. What can be host-tested is, in CI; assume the rest shows.
+- **Tested on one build:** 5-column Corne, beekeeb Prospector, macOS.
+- **Unfinished:** no runtime brightness, one hardcoded palette, Latin-only layer
+  names — kana or hanzi render as missing glyphs.
+- **No support promised.** Issues and PRs welcome, may go unanswered.
+
+Nothing here can brick a dongle: the UF2 bootloader is out of reach, so the worst
+case is a blank screen until you flash something else.
 
 ## Credit
 
