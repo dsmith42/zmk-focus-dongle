@@ -18,6 +18,9 @@
 
 #define MIN(m) ((int64_t)(m) * 60 * 1000)
 
+/* Every role, not only the three the dial emits: the switch is exhaustive on
+ * purpose, so adding a role makes this fail to compile rather than quietly
+ * printing "?" into a snapshot nobody would re-read. */
 static const char *role(enum focus_role r) {
     switch (r) {
     case FOCUS_ROLE_THEME:
@@ -26,6 +29,12 @@ static const char *role(enum focus_role r) {
         return "dim";
     case FOCUS_ROLE_GREY:
         return "grey";
+    case FOCUS_ROLE_ACCENT:
+        return "accent";
+    case FOCUS_ROLE_OK:
+        return "ok";
+    case FOCUS_ROLE_LOW:
+        return "low";
     }
     return "?";
 }

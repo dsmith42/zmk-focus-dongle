@@ -104,3 +104,11 @@ SOFTWARE.
      This replaces the three families the derived tree used, two of which
      (Foundry Gridnik, FRAC) are commercial and could not be redistributed at
      all. No part of those ships here.
+
+   Noto Sans Symbols — The Noto Project Authors — SIL Open Font License 1.1
+
+     https://github.com/notofonts/symbols
+
+     Five circled digits, ①..⑤, which the BLE profile indicator is drawn with.
+     No Latin text face carries them; this one does, and is openly licensed.
+     Licence text at src/fonts/NotoSansSymbols-OFL.txt.

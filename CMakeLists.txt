@@ -33,18 +33,28 @@ if(CONFIG_SHIELD_FOCUS_DONGLE)
         # The display driver shadows Zephyr's own — see drivers/display/.
         add_subdirectory(${ZEPHYR_CURRENT_MODULE_DIR}/drivers/display)
 
-        # The dial's view model. Display-only — nothing a keymap can reach — so
-        # unlike the timer core it is correctly behind the shield guard.
+        # The view models and their widgets. Display-only — nothing a keymap can
+        # reach — so unlike the timer core they are correctly behind the shield
+        # guard.
         #
-        # It is compiled HERE rather than in the shield's own CMakeLists because
-        # ZEPHYR_CURRENT_MODULE_DIR is only set while Zephyr's module system is
-        # processing this file. The shield CMakeLists is pulled in by the shield
-        # mechanism instead, where the variable is empty — a source path there
-        # resolved to a bare "/src/dial.c" and failed the dongle build.
+        # They are compiled HERE rather than in the shield's own CMakeLists
+        # because ZEPHYR_CURRENT_MODULE_DIR is only set while Zephyr's module
+        # system is processing this file. The shield CMakeLists is pulled in by
+        # the shield mechanism instead, where the variable is empty — a source
+        # path there resolved to a bare "/src/dial.c" and failed the dongle
+        # build.
         zephyr_library_sources(src/dial.c)
         zephyr_library_sources(src/dial_widget.c)
+        zephyr_library_sources(src/status.c)
+        zephyr_library_sources(src/status_widget.c)
+
+        # Role -> colour, shared by both widgets. The one place a theme changes.
+        zephyr_library_sources(src/theme.c)
 
         # Baked glyph subsets. Display-only, so they sit behind the shield guard
-        # with the widget that draws them. Regenerate with scripts/gen_dinish.sh.
+        # with the widgets that draw them. Regenerate with scripts/gen_fonts.sh.
         zephyr_library_sources(src/fonts/DINish_Medium_32.c)
+        zephyr_library_sources(src/fonts/DINish_Medium_24.c)
+        zephyr_library_sources(src/fonts/DINish_Medium_20.c)
+        zephyr_library_sources(src/fonts/NotoSymbols_Regular_28.c)
 endif()

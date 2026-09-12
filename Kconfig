@@ -6,6 +6,15 @@ config FOCUS_DONGLE_ROTATE_DISPLAY_180
     bool "Rotate the display 180 degrees"
     default n
 
+config FOCUS_DONGLE_LAYER_NAME_UPPERCASE
+    bool "Draw layer names in upper case"
+    default y
+    help
+      The keymap's display-name is shown as written when this is off. The
+      uppercasing is ASCII-only by construction: bytes above 0x7F belong to a
+      UTF-8 sequence and are left alone, so a name in a script with no case is
+      unaffected either way.
+
 config FOCUS_DONGLE_USE_AMBIENT_LIGHT_SENSOR
     bool "Use an ambient light sensor for auto brightness"
     default n

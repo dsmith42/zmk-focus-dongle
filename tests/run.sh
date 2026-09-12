@@ -22,6 +22,18 @@ $CC $FLAGS -o "$OUT/timer" tests/test_timer.c src/timer.c
 $CC $FLAGS -o "$OUT/dial" tests/test_dial.c src/dial.c
 "$OUT/dial"
 
+$CC $FLAGS -o "$OUT/status" tests/test_status.c src/status.c
+"$OUT/status"
+
+# ...and again with the target's char signedness. arm-none-eabi defaults to
+# UNSIGNED char; x86 and Apple silicon hosts default to signed. The layer
+# label's UTF-8 rule is exactly the kind of thing that difference hides: a
+# naive `c >= 'a'` uppercase passes on the host and mangles every multi-byte
+# name on the dongle, with no log and nothing but a wrong glyph to show for it.
+echo "  ...and again with unsigned char:"
+$CC $FLAGS -funsigned-char -o "$OUT/status-unsigned" tests/test_status.c src/status.c
+"$OUT/status-unsigned"
+
 $CC $FLAGS -o "$OUT/snapshot" tests/snapshot_dial.c src/dial.c
 
 if [ "$1" = "--update" ]; then
