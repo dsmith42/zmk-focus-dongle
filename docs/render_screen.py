@@ -204,9 +204,7 @@ def draw_dial(d, st):
 
 
 def draw_status(d, layer, profile, batteries, held):
-    circled = len(profile) == 1
-    d.text((PANEL[0] - INSET, PROFILE_Y), profile,
-           font=font("NotoSymbols_Regular_28" if circled else "DINish_Medium_20"),
+    d.text((PANEL[0] - INSET, PROFILE_Y), profile, font=font("DINish_Medium_24"),
            fill=ROLE["grey"], anchor="rt")
 
     for i, level in enumerate(batteries):
@@ -235,10 +233,48 @@ def render(state, layer, profile, batteries, held):
 
 SCENES = [
     # snapshot label,            file stem,  layer,   profile, batteries, held (GACS)
-    ("armed 45, not started",    "armed",    "Focus", "\u2460", [84, 61], [0, 0, 0, 0]),
-    ("running 21 of 45",         "running",  "Base",  "\u2460", [84, 61], [1, 1, 0, 0]),
-    ("overrun 15 past a 45",     "overrun",  "Base",  "USB",    [84, 9],  [0, 0, 0, 0]),
+    ("armed 45, not started",    "armed",    "Focus", "1",   [84, 61], [0, 0, 0, 0]),
+    ("running 21 of 45",         "running",  "Base",  "1",   [84, 61], [1, 1, 0, 0]),
+    ("overrun 15 past a 45",     "overrun",  "Base",  "USB", [84, 9],  [0, 0, 0, 0]),
 ]
+
+# The annotated diagram. Callouts are (label, anchor point on the panel, where
+# the text sits), in PANEL coordinates — the arrows are drawn to the real
+# positions the constants above produce, so a moved element drags its label.
+LEGEND_SCENE = ("running 21 of 45", "Base", "1", [84, 61], [1, 1, 0, 0])
+CALLOUTS = [
+    # Each leader starts just OUTSIDE its element and exits the nearer edge, so
+    # no line is ever drawn through the thing it is naming.
+    ("minutes left",        (PANEL[0] - INSET + 4, 34),                  "right"),
+    ("block remaining",     (CX + 40, CY - 40),                          "right"),
+    ("BLE profile, or USB", (PANEL[0] - INSET + 4, PROFILE_Y + 9),       "right"),
+    ("battery, each half",  (PANEL[0] - INSET + 4, BATTERY_Y + 9),       "right"),
+    ("held modifiers",      (PANEL[0] - CORNER + 4, PANEL[1] + MODS_Y - 8), "right"),
+    ("block length",        (CX - 40, CY + 34),                          "left"),
+    ("active layer",        (CORNER - 4, PANEL[1] + MODS_Y - 8),         "left"),
+]
+
+
+def render_legend(state):
+    """The same screen, on a wider canvas, with the parts named."""
+    pad_x, pad_y = 215, 30
+    size = (PANEL[0] + pad_x * 2, PANEL[1] + pad_y * 2)
+    img = Image.new("RGB", size, (0, 0, 0))
+    img.paste(render(state, *LEGEND_SCENE[1:]), (pad_x, pad_y))
+
+    d = ImageDraw.Draw(img)
+    label_font = font("DINish_Medium_20")
+    rule = (0x6A, 0x6A, 0x6A)
+
+    for text, (px, py), side in CALLOUTS:
+        x, y = px + pad_x, py + pad_y
+        edge = pad_x - 18 if side == "left" else pad_x + PANEL[0] + 18
+        d.line([(x, y), (edge, y)], fill=rule, width=1)
+        d.ellipse([x - 2, y - 2, x + 2, y + 2], fill=rule)
+        d.text((edge + (-6 if side == "left" else 6), y), text, font=label_font,
+               fill=(0xD8, 0xD4, 0xCC), anchor="rm" if side == "left" else "lm")
+
+    return img
 
 
 def main():
@@ -258,6 +294,11 @@ def main():
         img.resize((PANEL[0] * 2, PANEL[1] * 2), Image.LANCZOS).save(
             path.replace(".png", "@2x.png"))
         print(f"wrote {os.path.relpath(path, ROOT)}")
+
+    legend = render_legend(states[LEGEND_SCENE[0]])
+    path = os.path.join(outdir, "screen-legend.png")
+    legend.resize((legend.width * 2, legend.height * 2), Image.LANCZOS).save(path)
+    print(f"wrote {os.path.relpath(path, ROOT)}")
 
 
 if __name__ == "__main__":

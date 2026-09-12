@@ -29,21 +29,12 @@
 /* Below this the battery numeral turns red. */
 #define FOCUS_BATTERY_LOW_PCT 15
 
-/* How the profile indicator is drawn. The view model picks the form; the widget
- * owns which font each form uses.
+/* The profile indicator is the BLE profile number, 1-based, or "USB" when
+ * wired. Nothing decorates it: the number is what is read, and the circled
+ * digit it replaced spent a taller box and a second typeface saying "this is a
+ * profile" — something the README diagram says once, for free.
  *
- * Two forms exist because USB is three letters and will not fit in a circle —
- * so the moment a circled digit was chosen, a text form was needed anyway. That
- * makes a profile index past the baked glyphs free to handle: it falls back to
- * the same text form rather than needing a glyph that is not there. */
-enum focus_profile_form {
-    FOCUS_PROFILE_CIRCLED, /* ①..⑤ */
-    FOCUS_PROFILE_TEXT,    /* "USB", or "B 6" past the circled digits */
-};
-
-/* Circled digits baked into the font, and therefore the highest profile index
- * that can be drawn as one. */
-#define FOCUS_PROFILE_CIRCLED_MAX 5
+ * One form means one font, so the widget no longer switches face by state. */
 
 /* The four modifier glyphs, drawn in GACS order: ⌘ ⌥ ⌃ ⇧.
  *
@@ -96,10 +87,8 @@ struct focus_status_view {
      * never change. What changes is which of them is lit. */
     enum focus_role mods[FOCUS_MOD_COUNT];
 
-    /* The circled digit is UTF-8, so this is bytes too: three for a glyph,
-     * four for "B 12", and room to spare. */
+    /* "1".."9", or "USB". Eight bytes is room to spare. */
     char profile[8];
-    enum focus_profile_form profile_form;
     enum focus_role profile_role;
 
     struct {

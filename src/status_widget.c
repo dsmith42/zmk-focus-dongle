@@ -50,14 +50,15 @@
  * trims a subset font's line box to the glyphs it baked — so a label's box is
  * its ink and these numbers mean what they say.
  *
- *   profile   150 .. 174   (24px circled digit)
+ *   profile   157 .. 174   (17px numerals)
  *   battery   184 .. 201   (17px numerals)
  *
- * Ten pixels between them. The profile is where it is because the circled digit
- * is 10px taller than the "B 1" it replaces and would otherwise crowd the
- * batteries.
+ * Ten pixels between them. Profile and batteries share a face, a size and a
+ * right edge with the minutes numeral above them, so the whole column is one
+ * ruled line of numbers. What separates them is colour and position, not
+ * decoration: the profile is grey, the batteries carry the health role.
  */
-#define STATUS_PROFILE_Y 150
+#define STATUS_PROFILE_Y 157
 #define STATUS_BATTERY_Y 184
 #define STATUS_BATTERY_PITCH 36
 #define STATUS_INSET 10
@@ -108,14 +109,10 @@ static uint8_t battery_level[FOCUS_BATTERY_MAX];
 static struct focus_status_view prev;
 static bool have_prev;
 
-static const lv_font_t *font_for(enum focus_profile_form form) {
-    return form == FOCUS_PROFILE_CIRCLED ? &NotoSymbols_Regular_28 : &DINish_Medium_20;
-}
-
 static bool same_view(const struct focus_status_view *a, const struct focus_status_view *b) {
     if (strcmp(a->layer, b->layer) != 0 || a->layer_role != b->layer_role ||
-        strcmp(a->profile, b->profile) != 0 || a->profile_form != b->profile_form ||
-        a->profile_role != b->profile_role || a->battery_count != b->battery_count) {
+        strcmp(a->profile, b->profile) != 0 || a->profile_role != b->profile_role ||
+        a->battery_count != b->battery_count) {
         return false;
     }
 
@@ -153,12 +150,6 @@ static void render(const struct focus_status_view *v) {
             }
         }
 
-        /* The typeface is part of the profile's form: a circled digit comes from
-         * the symbol face, "USB" and the "B n" fallback from the Latin one. */
-        if (!have_prev || v->profile_form != prev.profile_form) {
-            lv_obj_set_style_text_font(widget->profile_label, font_for(v->profile_form),
-                                       LV_PART_MAIN);
-        }
         if (!have_prev || strcmp(v->profile, prev.profile) != 0) {
             lv_label_set_text(widget->profile_label, v->profile);
         }
@@ -285,9 +276,8 @@ int focus_widget_status_init(struct focus_widget_status *widget, lv_obj_t *paren
     lv_obj_set_style_border_width(widget->obj, 0, LV_PART_MAIN);
     lv_obj_set_style_pad_all(widget->obj, 0, LV_PART_MAIN);
 
-    widget->profile_label =
-        make_label(widget->obj, font_for(FOCUS_PROFILE_CIRCLED), FOCUS_ROLE_GREY, "",
-                   LV_ALIGN_TOP_RIGHT, -STATUS_INSET, STATUS_PROFILE_Y);
+    widget->profile_label = make_label(widget->obj, &DINish_Medium_24, FOCUS_ROLE_GREY, "",
+                                       LV_ALIGN_TOP_RIGHT, -STATUS_INSET, STATUS_PROFILE_Y);
 
     /* Batteries side by side, position carrying which half is which, so no L/R
      * prefixes are needed. Laid out from the right, so the pair stays against
