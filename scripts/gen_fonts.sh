@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+#
+# Regenerate the glyph subsets used by the display.
+#
+# The point of this script is that we never ship a whole face. A full DINish cut
+# is ~100 KB of flash per size; the glyphs actually drawn are a handful. Baking
+# only those keeps each font in the low single-digit KB, and makes it obvious in
+# review when the set changes.
+#
+# DINish is the one Latin family on this screen, deliberately. The tree this was
+# derived from used three (DINish, Foundry Gridnik, FRAC) of which two were
+# commercial and could not be redistributed. Collapsing onto DINish is what makes
+# the module shareable, and it is a better-looking screen for being consistent.
+#
+# The one non-Latin face is Noto Sans Symbols, which carries the circled digits
+# the BLE profile is drawn with. Also OFL, and also baked down to the five
+# glyphs used.
+#
+# Requires node (for npx) and network. The TTFs are downloaded rather than
+# vendored, both to keep the repo small and to make the OFL provenance obvious.
+
+set -euo pipefail
+
+BPP=4
+
+# DINish: SIL Open Font License 1.1. https://github.com/playbeing/dinish
+DINISH="https://raw.githubusercontent.com/playbeing/dinish/master/fonts/ttf/DINish/DINish-Medium.ttf"
+
+# Noto Sans Symbols: SIL Open Font License 1.1. https://github.com/notofonts/symbols
+NOTO_SYMBOLS="https://raw.githubusercontent.com/notofonts/notofonts.github.io/main/fonts/NotoSansSymbols/hinted/ttf/NotoSansSymbols-Regular.ttf"
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+out_dir="$repo_root/src/fonts"
+work="$(mktemp -d)"
+trap 'rm -rf "$work"' EXIT
+
+# generate <out-name> <ttf-url> <size> <set> <what-it-is>
+#
+# <set> is either a literal list of characters or an lv_font_conv range such as
+# 0x20-0x7E. Ranges exist for the layer label, whose text this module does not
+# author -- the name comes from someone else's keymap, so the set has to be the
+# whole printable block rather than the characters we happen to draw.
+generate() {
+    local out_name="$1" url="$2" size="$3" set="$4" what="$5"
+    local ttf="${url##*/}"
+    local selector=(--symbols "$set")
+
+    case "$set" in
+    0x*) selector=(--range "$set") ;;
+    esac
+
+    if [ ! -f "$work/$ttf" ]; then
+        echo "Fetching $ttf..."
+        curl -sSL --fail -o "$work/$ttf" "$url"
+    fi
+
+    echo "Converting ${what} at ${size}px, ${BPP}bpp..."
+    npx -y lv_font_conv@1.5.2 \
+        --font "$work/$ttf" \
+        --bpp "$BPP" \
+        --size "$size" \
+        --no-compress \
+        --format lvgl \
+        "${selector[@]}" \
+        -o "$out_dir/${out_name}.c"
+
+    python3 "$repo_root/scripts/fixup_font.py" "$out_dir/${out_name}.c"
+
+    # lv_font_conv records the exact argv it was invoked with in a comment at the
+    # top of the output. Those are absolute paths into a temp dir and someone's
+    # home directory, so the file would differ on every machine and leak the path.
+    # Rewrite them to a stable form, which makes regeneration a byte-for-byte
+    # no-op and keeps the diff honest about whether the glyphs actually changed.
+    sed -i.bak \
+        -e "s| --font [^ ]*/${ttf}| --font ttf/${ttf}|" \
+        -e "s| -o [^ ]*/${out_name}.c| -o ${out_name}.c|" \
+        "$out_dir/${out_name}.c"
+    rm -f "$out_dir/${out_name}.c.bak"
+
+    echo "  wrote ${out_name}.c ($(wc -c < "$out_dir/${out_name}.c") bytes of C)"
+}
+
+# The dial's minutes numeral. Digits only: the view model documents this number
+# as never negative -- it counts remaining down to zero, then total elapsed up --
+# so there is no sign to draw. If that ever changes, add a hyphen here.
+#
+# Size matches the FR_Medium_32 it replaces. DINish and FRAC do not share a cap
+# height, so this is a starting point to judge on hardware, not a match.
+generate "DINish_Medium_32" "$DINISH" 32 "0123456789" "dial numeral"
+
+# The layer label, and the two text forms of the profile indicator ("USB", and
+# the "B n" fallback past the circled digits). Printable ASCII, because the layer
+# name comes from the consumer's keymap: baking only the characters Dan's keymap
+# uses would give everyone else tofu, on a device with no log to explain it.
+# Costs ~4 KB against ~380 KB of free flash.
+generate "DINish_Medium_20" "$DINISH" 20 "0x20-0x7E" "layer label"
+
+# Battery percentages. Digits only -- the numerals sit side by side with position
+# carrying which half is which, so there is no "L"/"R" and no percent sign.
+generate "DINish_Medium_24" "$DINISH" 24 "0123456789" "battery numerals"
+
+# The BLE profile, as a circled digit rather than the old "B 1". Five, because
+# that is ZMK's usual profile count; a sixth profile falls back to text rather
+# than growing this set, since past five the number is the thing being read and
+# the ring has stopped earning its pixels.
+#
+# Outline (U+2460), not the filled U+2776 also present in this face: filled reads
+# as an alert badge next to the battery numerals, which is the wrong weight for
+# something consulted rather than watched.
+#
+# 28px because the payload is the digit INSIDE the ring, and the ring is ~82% of
+# the em against DINish's 71% cap height -- at 20px the inner digit is under 8px
+# and 3/5/6 blur into each other at a glance. The thin stroke keeps its visual
+# weight under the battery numerals despite the larger box.
+generate "NotoSymbols_Regular_28" "$NOTO_SYMBOLS" 28 "①②③④⑤" "profile circled digits"
+
+echo
+echo "Fonts are OFL. src/fonts/DINish-OFL.txt and src/fonts/NotoSansSymbols-OFL.txt"
+echo "travel with them; see NOTICE."
