@@ -38,8 +38,8 @@ in its place, so a chord is read by what brightened rather than by what appeared
 | --- | --- | --- |
 | ![teal](docs/images/theme-teal.png) | ![red](docs/images/theme-red.png) | ![blue](docs/images/theme-blue.png) |
 | `&focus_theme 0` — Teal | `&focus_theme 1` — Red | `&focus_theme 2` — Blue |
-| ![amber](docs/images/theme-amber.png) | ![violet](docs/images/theme-violet.png) | ![green](docs/images/theme-green.png) |
-| `&focus_theme 3` — Amber | `&focus_theme 4` — Violet | `&focus_theme 5` — Green |
+| ![orange](docs/images/theme-orange.png) | ![violet](docs/images/theme-violet.png) | ![green](docs/images/theme-green.png) |
+| `&focus_theme 3` — Orange | `&focus_theme 4` — Violet | `&focus_theme 5` — Green |
 
 **They are named for their colours and mean nothing on their own.** Pick one you like and
 never touch it again, or bind the six and give them meanings of your own — the module has
@@ -67,7 +67,7 @@ says what the block is without a word on screen:
 | --- | --- |
 | Red | urgent |
 | Blue | deep work |
-| Amber | admin |
+| Orange | admin |
 | Violet | creative |
 | Green | recharge |
 | Teal | none of the above — the default |
