@@ -50,15 +50,20 @@
  * trims a subset font's line box to the glyphs it baked — so a label's box is
  * its ink and these numbers mean what they say.
  *
- *   profile   157 .. 174   (17px numerals)
+ *   profile   160 .. 174   (14px, the layer label's size)
  *   battery   184 .. 201   (17px numerals)
  *
- * Ten pixels between them. Profile and batteries share a face, a size and a
- * right edge with the minutes numeral above them, so the whole column is one
- * ruled line of numbers. What separates them is colour and position, not
- * decoration: the profile is grey, the batteries carry the health role.
+ * Ten pixels between them, and one right edge shared with the minutes numeral
+ * above, so the column is one ruled line of numbers.
+ *
+ * The profile is the SMALLEST thing in that column deliberately. It is the
+ * least consulted — which host is connected changes rarely and is usually
+ * already known — so it sits below the batteries in size as well as position.
+ * At 24 it read as the most important number on the panel, and it was larger
+ * than the layer name, which is looked at far more often. Now it matches the
+ * layer label: two pieces of standing context, drawn at the same weight.
  */
-#define STATUS_PROFILE_Y 157
+#define STATUS_PROFILE_Y 160
 #define STATUS_BATTERY_Y 184
 #define STATUS_BATTERY_PITCH 36
 #define STATUS_INSET 10
@@ -280,7 +285,7 @@ int focus_widget_status_init(struct focus_widget_status *widget, lv_obj_t *paren
     lv_obj_set_style_border_width(widget->obj, 0, LV_PART_MAIN);
     lv_obj_set_style_pad_all(widget->obj, 0, LV_PART_MAIN);
 
-    widget->profile_label = make_label(widget->obj, &DINish_Medium_24, FOCUS_ROLE_GREY, "",
+    widget->profile_label = make_label(widget->obj, &DINish_Medium_20, FOCUS_ROLE_GREY, "",
                                        LV_ALIGN_TOP_RIGHT, -STATUS_INSET, STATUS_PROFILE_Y);
 
     /* Batteries side by side, position carrying which half is which, so no L/R

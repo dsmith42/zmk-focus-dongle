@@ -94,12 +94,13 @@ generate "DINish_Medium_32" "$DINISH" 32 "0123456789" "dial numeral"
 # Costs ~4 KB against ~380 KB of free flash.
 generate "DINish_Medium_20" "$DINISH" 20 "0x20-0x7E" "layer label"
 
-# Battery percentages and the BLE profile. Digits, plus the three letters of
-# "USB" -- the profile is a plain number and needs a word only when wired.
+# Battery percentages. Digits only -- the numerals sit side by side with position
+# carrying which half is which, so there is no "L"/"R" and no percent sign.
 #
-# The batteries sit side by side with position carrying which half is which, so
-# there is no "L"/"R" and no percent sign.
-generate "DINish_Medium_24" "$DINISH" 24 "0123456789USB" "battery and profile numerals"
+# The BLE profile used to share this size and needed the letters of "USB" with
+# it; it is drawn at 20 now, where the layer label's printable-ASCII set already
+# covers both forms.
+generate "DINish_Medium_24" "$DINISH" 24 "0123456789" "battery numerals"
 
 # The held modifiers, in GACS order. Four glyphs from ONE face, which was the
 # open question of this rung: the spec's plan was to merge Noto Sans Symbols 1

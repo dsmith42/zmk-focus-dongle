@@ -41,6 +41,10 @@ if(CONFIG_DT_HAS_ZMK_BEHAVIOR_FOCUS_THEME_NEXT_ENABLED)
         zephyr_library_sources(src/behaviors/behavior_focus_theme_next.c)
 endif()
 
+if(CONFIG_DT_HAS_ZMK_BEHAVIOR_SCREEN_BRIGHTNESS_ENABLED)
+        zephyr_library_sources(src/behaviors/behavior_screen_brightness.c)
+endif()
+
 if(CONFIG_SHIELD_FOCUS_DONGLE)
         # The display driver shadows Zephyr's own — see drivers/display/.
         add_subdirectory(${ZEPHYR_CURRENT_MODULE_DIR}/drivers/display)

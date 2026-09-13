@@ -49,6 +49,21 @@
             compatible = "zmk,behavior-focus-theme-next";
             #binding-cells = <0>;
         };
+
+        /* One node per direction, each carrying its own step. The keymap reads
+         * as two named keys rather than one behaviour plus a magic constant,
+         * which is what the derived tree's &bri BRI_UP needed a header for. */
+        brighter: screen_brighter {
+            compatible = "zmk,behavior-screen-brightness";
+            step = <20>;
+            #binding-cells = <0>;
+        };
+
+        dimmer: screen_dimmer {
+            compatible = "zmk,behavior-screen-brightness";
+            step = <(-20)>;
+            #binding-cells = <0>;
+        };
     };
 
     keymap {
@@ -57,8 +72,8 @@
         base_layer {
             display-name = "Base";
             bindings = <
-&focus 45    &focus_start  &focus_theme 2
-&focus_stop  &focus_next   &none
+&focus 45    &focus_start  &focus_theme 2  &brighter
+&focus_stop  &focus_next   &none           &dimmer
             >;
         };
     };

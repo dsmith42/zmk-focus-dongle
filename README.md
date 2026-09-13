@@ -95,9 +95,9 @@ finished.
 - **`main` moves.** No releases, no deprecations — **pin a SHA** in your `west.yml`.
 - **Largely vibe coded.** Written by an LLM to my design decisions, reviewed rather
   than hand-audited. What can be host-tested is, in CI; assume the rest shows.
-- **Tested on one build:** 5-column Corne, beekeeb Prospector, macOS.
-- **Unfinished:** no runtime brightness, and Latin-only layer names — kana or hanzi
-  render as missing glyphs.
+- **Tested on one build:** 5-column Corne, beekeeb Prospector (no ambient light
+  sensor — that variant is unsupported), macOS.
+- **Unfinished:** Latin-only layer names — kana or hanzi render as missing glyphs.
 - **No support promised.** Issues and PRs welcome, may go unanswered.
 
 Nothing here can brick a dongle: the UF2 bootloader is out of reach, so the worst

@@ -1,0 +1,36 @@
+# SPDX-License-Identifier: MIT
+
+description: |
+  Step the display backlight.
+
+  Declare one node per direction and give each its own step, rather than passing
+  a direction as a parameter:
+
+      screen_brighter: screen_brighter {
+          compatible = "zmk,behavior-screen-brightness";
+          step = <20>;
+          #binding-cells = <0>;
+      };
+
+      screen_dimmer: screen_dimmer {
+          compatible = "zmk,behavior-screen-brightness";
+          step = <(-20)>;
+          #binding-cells = <0>;
+      };
+
+  The value is clamped to 5..100 percent. Not down to zero: an unreadable screen
+  looks identical to a broken one, and the way back would be a key you cannot
+  see.
+
+  Nothing is persisted — a power cycle returns to
+  CONFIG_FOCUS_DONGLE_FIXED_BRIGHTNESS, like every other piece of state here.
+
+compatible: "zmk,behavior-screen-brightness"
+
+properties:
+  step:
+    type: int
+    required: true
+    description: Percent to change by. Negative dims.
+
+include: zero_param.yaml
