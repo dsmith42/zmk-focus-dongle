@@ -4,9 +4,11 @@
  * A dongle is a split central with no keys of its own, and that is all this
  * describes.
  *
- * The 2x2 matrix is a fiction. ZMK requires a transform and a keymap of
- * matching size; four positions satisfy that and leave room to bind this
- * module's behaviours as they arrive.
+ * The 2x3 matrix is a fiction. ZMK requires a transform and a keymap of
+ * matching size; six positions satisfy that and leave room to bind this
+ * module's behaviours as they arrive — every one of them is bound, so CI fails
+ * if a behaviour stops resolving rather than only if the widgets stop
+ * compiling.
  */
 
 #include <dt-bindings/zmk/matrix_transform.h>
@@ -29,11 +31,11 @@
 
     keymap_transform_0: keymap_transform_0 {
         compatible = "zmk,matrix-transform";
-        columns = <2>;
+        columns = <3>;
         rows = <2>;
         map = <
-RC(0,0) RC(0,1)
-RC(1,0) RC(1,1)
+RC(0,0) RC(0,1) RC(0,2)
+RC(1,0) RC(1,1) RC(1,2)
         >;
     };
 

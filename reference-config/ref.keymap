@@ -44,6 +44,11 @@
             compatible = "zmk,behavior-focus-theme";
             #binding-cells = <1>;
         };
+
+        focus_next: focus_theme_next {
+            compatible = "zmk,behavior-focus-theme-next";
+            #binding-cells = <0>;
+        };
     };
 
     keymap {
@@ -52,8 +57,8 @@
         base_layer {
             display-name = "Base";
             bindings = <
-&focus 45    &focus_start
-&focus_stop  &focus_theme 2
+&focus 45    &focus_start  &focus_theme 2
+&focus_stop  &focus_next   &none
             >;
         };
     };

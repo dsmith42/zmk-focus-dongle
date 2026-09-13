@@ -89,6 +89,18 @@ static uint32_t wedge_of(uint8_t theme) {
     return themes[0].wedge;
 }
 
+uint8_t focus_theme_after(uint8_t current) {
+    for (size_t i = 0; i < ARRAY_SIZE(themes); i++) {
+        if (themes[i].index == current) {
+            return themes[(i + 1) % ARRAY_SIZE(themes)].index;
+        }
+    }
+
+    /* Cycling from an index nobody declared starts the cycle rather than
+     * stalling on it. */
+    return themes[0].index;
+}
+
 static uint32_t lighten(uint32_t c, int pct) {
     uint32_t r = (c >> 16) & 0xff, g = (c >> 8) & 0xff, b = c & 0xff;
 
