@@ -50,11 +50,16 @@
  * trims a subset font's line box to the glyphs it baked — so a label's box is
  * its ink and these numbers mean what they say.
  *
- *   profile   160 .. 174   (14px, the layer label's size)
+ *   profile   154 .. 168   (14px, the layer label's size)
  *   battery   184 .. 201   (17px numerals)
  *
- * Ten pixels between them, and one right edge shared with the minutes numeral
- * above, so the column is one ruled line of numbers.
+ * Sixteen pixels between them, and one right edge shared with the minutes
+ * numeral above, so the column is one ruled line of numbers.
+ *
+ * Ten was not enough on hardware: the profile read as a label belonging to the
+ * batteries rather than as its own line. They are unrelated facts that happen
+ * to share a column, so the air between them has to be wider than the gap
+ * between the two battery numerals themselves.
  *
  * The profile is the SMALLEST thing in that column deliberately. It is the
  * least consulted — which host is connected changes rarely and is usually
@@ -63,7 +68,7 @@
  * than the layer name, which is looked at far more often. Now it matches the
  * layer label: two pieces of standing context, drawn at the same weight.
  */
-#define STATUS_PROFILE_Y 160
+#define STATUS_PROFILE_Y 154
 #define STATUS_BATTERY_Y 184
 #define STATUS_BATTERY_PITCH 36
 #define STATUS_INSET 10
