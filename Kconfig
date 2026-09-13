@@ -1,6 +1,6 @@
 # Option names and wording derived from carrefinho/prospector-zmk-module (MIT) —
-# see NOTICE. Changed: the ambient light sensor option now defaults off and says
-# it is unsupported; options for features this module does not have are dropped.
+# see NOTICE. Changed: options for features this module does not have are
+# dropped, including the ambient light sensor.
 
 config FOCUS_DONGLE_ROTATE_DISPLAY_180
     bool "Rotate the display 180 degrees"
@@ -15,17 +15,15 @@ config FOCUS_DONGLE_LAYER_NAME_UPPERCASE
       UTF-8 sequence and are left alone, so a name in a script with no case is
       unaffected either way.
 
-config FOCUS_DONGLE_USE_AMBIENT_LIGHT_SENSOR
-    bool "Use an ambient light sensor for auto brightness"
-    default n
-    help
-      Unsupported. The Prospector's ambient light sensor is an optional add-on
-      breakout rather than a populated part, and this build has none, so the
-      code path has never been tested against hardware. Left here because
-      brightness.c still carries the branch. Fixed brightness is the default.
-
 config FOCUS_DONGLE_FIXED_BRIGHTNESS
-    int "Fixed display brightness"
+    int "Display brightness at boot"
     default 60
     range 1 100
-    depends on !FOCUS_DONGLE_USE_AMBIENT_LIGHT_SENSOR
+    help
+      Where the backlight starts. A screen-brightness binding steps it from
+      there at runtime; nothing is persisted, so a power cycle comes back
+      here.
+
+      There is no auto-brightness: the Prospector's ambient light sensor is an
+      optional breakout rather than a populated part, and this module has never
+      had one to test against.
