@@ -43,9 +43,14 @@ in its place, so a chord is read by what brightened rather than by what appeared
 
 **They are named for their colours and mean nothing on their own.** Pick one you like and
 never touch it again, or bind the six and give them meanings of your own — the module has
-no opinion. `&focus_theme N` works **while a block is running**, unlike arming and
-starting: length and elapsed time are what a stray keypress must not destroy, and a
-colour destroys nothing.
+no opinion.
+
+Two ways to choose: `&focus_theme N` for a palette per key, or **`&focus_theme_next`** on a
+single key to cycle through them. Cycling walks the palettes devicetree declared rather
+than counting to six, so one you add yourself is in the cycle too.
+
+Both work **while a block is running**, unlike arming and starting: length and elapsed
+time are what a stray keypress must not destroy, and a colour destroys nothing.
 
 A theme declares one colour, its wedge; the armed preview and the hand are derived from
 it, so a palette cannot be internally inconsistent and a seventh is one devicetree node.

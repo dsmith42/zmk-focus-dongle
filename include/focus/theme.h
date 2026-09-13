@@ -49,3 +49,15 @@ uint32_t focus_hex_of(enum focus_role role, uint8_t theme);
 /* The dial's hand, which is always ONE STEP brighter than the wedge it points
  * over. Derived rather than declared, so a palette still only names its wedge. */
 uint32_t focus_hand_hex(enum focus_role wedge_role, uint8_t theme);
+
+/* The palette after this one, wrapping — what a cycling binding steps through.
+ *
+ * It walks the DECLARED indices in devicetree order rather than counting, so a
+ * consumer whose palette is index 9 is still reachable by cycling and a gap in
+ * the numbering cannot produce a colour nobody declared.
+ *
+ * Weakly defined in the behaviour that calls it, so a split peripheral — which
+ * compiles the same keymap and therefore the same binding, while having no
+ * display shield and no theme nodes — links and does nothing. Same reason the
+ * timer core builds on every target. */
+uint8_t focus_theme_after(uint8_t current);
