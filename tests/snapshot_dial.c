@@ -85,6 +85,8 @@ int main(void) {
     emit("armed 45, not started", false, 0, 0, 45);
     emit("armed 90, not started", false, 0, 0, 90);
     emit("running 45 of 45", true, MIN(45), MIN(45), 45);
+    emit("running 60 of 60", true, MIN(60), MIN(60), 60);
+    emit("running 90 of 90", true, MIN(90), MIN(90), 90);
     emit("running 21 of 45", true, MIN(21), MIN(45), 45);
     emit("running 42 of 60", true, MIN(42), MIN(60), 45);
     emit("running 1 of 45", true, MIN(1), MIN(45), 45);
