@@ -20,11 +20,11 @@
 /* The dial's minutes numeral. Digits only — the number is never negative. */
 extern const lv_font_t DINish_Medium_32;
 
-/* Battery percentages and the BLE profile — digits, plus the three letters of
- * "USB" for when the profile is not in use. */
+/* Battery percentages. Digits only. */
 extern const lv_font_t DINish_Medium_24;
 
-/* The layer label, plus the profile indicator's two text forms. Printable
+/* The layer label and the BLE profile — the two pieces of standing context, at
+ * the same size. Printable
  * ASCII, because the layer name comes from the consumer's keymap rather than
  * from this module: baking only the characters one keymap happens to use would
  * give everyone else tofu, on a device with no log to explain it. */

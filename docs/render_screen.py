@@ -234,7 +234,7 @@ def draw_dial(d, st, theme):
 
 
 def draw_status(d, layer, profile, batteries, held):
-    d.text((PANEL[0] - INSET, PROFILE_Y), profile, font=font("DINish_Medium_24"),
+    d.text((PANEL[0] - INSET, PROFILE_Y), profile, font=font("DINish_Medium_20"),
            fill=FIXED_ROLES["grey"], anchor="rt")
 
     for i, level in enumerate(batteries):
