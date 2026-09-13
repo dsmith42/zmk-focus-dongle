@@ -50,11 +50,11 @@
       label = "Blue";
    };
 
-   focus_amber: focus_amber {
+   focus_orange: focus_orange {
       compatible = "zmk,focus-theme";
       index = <3>;
-      wedge = <0xFFB020>;
-      label = "Amber";
+      wedge = <0xE07B14>;
+      label = "Orange";
    };
 
    focus_violet: focus_violet {
